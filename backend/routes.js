@@ -114,25 +114,14 @@ router.delete("/pagamentos/:id", (req, res) => {
 router.post("/aulas", (req, res) => {
   const { aluno_id, data_agendada } = req.body;
 
-  db.get(
-    `SELECT valor_mensal, aulas_por_mes FROM alunos WHERE id = ?`,
-    [aluno_id],
-    (err, aluno) => {
+  db.run(
+    `INSERT INTO aulas 
+     (aluno_id, data_agendada, status)
+     VALUES (?, ?, 'agendada')`,
+    [aluno_id, data_agendada],
+    function (err) {
       if (err) return res.status(500).json(err);
-      if (!aluno) return res.status(404).json({ error: "Aluno não encontrado" });
-
-      const valor_aula = aluno.valor_mensal / aluno.aulas_por_mes;
-
-      db.run(
-        `INSERT INTO aulas 
-         (aluno_id, data_agendada, status, valor_aula)
-         VALUES (?, ?, 'agendada', ?)`,
-        [aluno_id, data_agendada, valor_aula],
-        function (err2) {
-          if (err2) return res.status(500).json(err2);
-          res.json({ id: this.lastID });
-        }
-      );
+      res.json({ id: this.lastID });
     }
   );
 });
@@ -273,45 +262,30 @@ router.get("/extrato/:aluno_id", (req, res) => {
 router.get("/saldo/:aluno_id", (req, res) => {
   const alunoId = req.params.aluno_id;
 
-  const queryPagamentos = `
-    SELECT valor FROM pagamentos WHERE aluno_id = ?
-  `;
-
-  const queryAulas = `
-  SELECT 
-    id,
-    data_agendada as data_evento,
-    valor_aula as valor,
-    status,
-    'aula' as tipo
-  FROM aulas
-  WHERE aluno_id = ?
-`;
-
-  db.all(queryPagamentos, [alunoId], (err, pagamentos) => {
-    if (err) return res.status(500).json(err);
-
-    db.all(queryAulas, [alunoId], (err2, aulas) => {
-      if (err2) return res.status(500).json(err2);
-
-      let saldo = 0;
-
-      pagamentos.forEach(p => saldo += p.valor);
-
-      aulas.forEach(a => {
-        if (
-          a.status === "realizada" ||
-          a.status === "cancelada_sem_justificativa"
-        ) {
-          saldo -= a.valor;
-        }
-      });
-
-      res.json({ saldo });
-    });
-  });
+  db.get(
+    `
+    SELECT 
+      IFNULL(
+        (SELECT SUM(creditos_gerados) 
+         FROM pagamentos 
+         WHERE aluno_id = ?), 0
+      )
+      -
+      IFNULL(
+        (SELECT COUNT(*) 
+         FROM aulas 
+         WHERE aluno_id = ?
+         AND status IN ('realizada','cancelada_sem_justificativa')
+        ), 0
+      ) as creditos
+    `,
+    [alunoId, alunoId],
+    (err, row) => {
+      if (err) return res.status(500).json(err);
+      res.json({ saldo: row.creditos });
+    }
+  );
 });
-
 
 // ==================================================
 // 🔹 RELATORIO DO PROFESSOR
@@ -353,10 +327,10 @@ router.get("/dashboard/:mes", (req, res) => {
 
       -- Total consumido (realizadas + cancelada_sem_justificativa)
       (
-        SELECT IFNULL(SUM(valor_aula),0) FROM aulas 
-        WHERE status IN ('realizada','cancelada_sem_justificativa')
-        AND data_agendada BETWEEN ? AND ?
-      ) as total_consumido
+  SELECT COUNT(*) FROM aulas 
+  WHERE status IN ('realizada','cancelada_sem_justificativa')
+  AND data_agendada BETWEEN ? AND ?
+) as total_consumido
   `;
 
   db.get(
@@ -371,8 +345,8 @@ router.get("/dashboard/:mes", (req, res) => {
     (err, row) => {
       if (err) return res.status(500).json(err);
 
-      const totalARealizar =
-        row.total_recebido - row.total_consumido;
+     // const totalARealizar =
+     //   row.total_recebido - row.total_consumido;
 
       res.json({
         total_alunos: row.total_alunos,
