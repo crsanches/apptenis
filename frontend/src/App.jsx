@@ -2,8 +2,20 @@ import { useState, useEffect } from "react";
 import Dashboard from "./screens/Dashboard";
 import ExtratoAluno from "./screens/ExtratoAluno";
 import ResumoProfessor from "./screens/ResumoProfessor";
+import { useState, useEffect } from "react";
+import { API_URL } from "./config";
 
 function App() {
+
+  const [pagamentos, setPagamentos] = useState([]);
+
+  useEffect(() => {
+    fetch(`${API_URL}/pagamentos`)
+      .then(res => res.json())
+      .then(data => setPagamentos(data))
+      .catch(err => console.error("Erro ao buscar pagamentos:", err));
+  }, []);
+
   const [tela, setTela] = useState(() => {
     return localStorage.getItem("tela") || "menu";
   });
@@ -94,8 +106,10 @@ function App() {
       )}
   
       {tela === "resumo" && (
-        <ResumoProfessor />
-      )}
+  <ResumoProfessor
+    pagamentos={pagamentos}
+  />
+)}
       
       {tela === "controle" && (
         <Dashboard abrirExtrato={abrirExtrato} />
