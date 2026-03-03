@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import Dashboard from "./screens/Dashboard";
 import ExtratoAluno from "./screens/ExtratoAluno";
+import ResumoProfessor from "./screens/ResumoProfessor";
 
 function App() {
   const [tela, setTela] = useState(() => {
-    return localStorage.getItem("tela") || "dashboard";
+    return localStorage.getItem("tela") || "menu";
   });
 
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
@@ -12,8 +13,8 @@ function App() {
   // 🔹 Garantir consistência se atualizar página
   useEffect(() => {
     if (tela === "extrato" && !alunoSelecionado) {
-      setTela("dashboard");
-      localStorage.setItem("tela", "dashboard");
+      setTela("controle");
+      localStorage.setItem("tela", "controle");
     }
   }, [tela, alunoSelecionado]);
 
@@ -24,9 +25,24 @@ function App() {
   };
 
   const voltarDashboard = () => {
-    setTela("dashboard");
+    setTela("controle");
     setAlunoSelecionado(null);
-    localStorage.setItem("tela", "dashboard");
+    localStorage.setItem("tela", "controle");
+  };
+
+  const irParaMenu = () => {
+    setTela("menu");
+    localStorage.setItem("tela", "menu");
+  };
+  
+  const irParaResumo = () => {
+    setTela("resumo");
+    localStorage.setItem("tela", "resumo");
+  };
+  
+  const irParaControle = () => {
+    setTela("controle");
+    localStorage.setItem("tela", "controle");
   };
 
   return (
@@ -34,6 +50,26 @@ function App() {
 
       {/* Header */}
       <div className="mb-6">
+
+      {tela === "menu" && (
+  <div className="space-y-6">
+
+    <button
+      onClick={irParaResumo}
+      className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-semibold"
+    >
+      📊 Resumo do Professor
+    </button>
+
+    <button
+      onClick={irParaControle}
+      className="w-full bg-green-600 text-white py-4 rounded-xl text-lg font-semibold"
+    >
+      🎾 Controle de Aulas
+    </button>
+
+  </div>
+)}
 
         {tela === "extrato" && (
           <button
@@ -51,7 +87,12 @@ function App() {
       </div>
 
       {/* Renderização das telas */}
-      {tela === "dashboard" && (
+
+      {tela === "resumo" && (
+        <ResumoProfessor voltar={irParaMenu} />
+      )}
+      
+      {tela === "controle" && (
         <Dashboard abrirExtrato={abrirExtrato} />
       )}
 
