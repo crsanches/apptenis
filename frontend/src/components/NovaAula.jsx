@@ -48,7 +48,7 @@ function NovaAula({ fechar }) {
       </select>
 
       <input
-        type="datetime-local"
+        type="date"
         className="w-full border rounded-lg p-2"
         value={data}
         onChange={e => setData(e.target.value)}

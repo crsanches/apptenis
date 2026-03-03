@@ -34,7 +34,7 @@ function RemarcarAula({ aula, fechar, atualizar }) {
       </p>
 
       <input
-        type="datetime-local"
+        type="date"
         className="w-full border rounded-lg p-2"
         value={novaData}
         onChange={(e) => setNovaData(e.target.value)}
