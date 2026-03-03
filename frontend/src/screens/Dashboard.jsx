@@ -13,6 +13,16 @@ function Dashboard({ abrirExtrato }) {
   const [loading, setLoading] = useState(true);
   const [dashboard, setDashboard] = useState(null);
 
+  // 🔹 MÊS SELECIONADO (sem usar toISOString)
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+
+  const [mesSelecionado, setMesSelecionado] = useState(
+    `${ano}-${mes}`
+  );
+
+  // 🔹 Carregar alunos e saldos
   const carregar = async () => {
     try {
       setLoading(true);
@@ -44,15 +54,17 @@ function Dashboard({ abrirExtrato }) {
     }
   };
 
-  useEffect(() => {
-    carregar();
-  }, []);
-
+  // 🔹 Carregar dashboard mensal
   useEffect(() => {
     fetch(`${API_URL}/dashboard/${mesSelecionado}`)
       .then(res => res.json())
-      .then(data => setDashboard(data));
+      .then(data => setDashboard(data))
+      .catch(err => console.error("Erro dashboard:", err));
   }, [mesSelecionado]);
+
+  useEffect(() => {
+    carregar();
+  }, []);
 
   const corSaldo = (saldo) => {
     if (saldo > 0) return "text-green-600";
@@ -71,39 +83,54 @@ function Dashboard({ abrirExtrato }) {
     <>
       <div className="space-y-6 pb-20">
 
-      {dashboard && (
-  <div className="grid grid-cols-2 gap-3 mb-4">
+        {/* 🔹 Seletor de Mês */}
+        <div className="flex items-center gap-2">
+          <label className="text-sm font-semibold text-gray-600">
+            Selecionar mês:
+          </label>
 
-    <div className="bg-white rounded-xl shadow p-3 text-sm">
-      <p className="text-gray-500">Alunos</p>
-      <p className="text-xl font-bold text-primary">
-        {dashboard.total_alunos}
-      </p>
-    </div>
+          <input
+            type="month"
+            value={mesSelecionado}
+            onChange={(e) => setMesSelecionado(e.target.value)}
+            className="border rounded px-2 py-1 text-sm"
+          />
+        </div>
 
-    <div className="bg-white rounded-xl shadow p-3 text-sm">
-      <p className="text-gray-500">Aulas realizadas</p>
-      <p className="text-xl font-bold text-green-600">
-        {dashboard.total_realizadas}
-      </p>
-    </div>
+        {/* 🔹 Painel Resumo */}
+        {dashboard && (
+          <div className="grid grid-cols-2 gap-3">
 
-    <div className="bg-white rounded-xl shadow p-3 text-sm">
-      <p className="text-gray-500">Total recebido</p>
-      <p className="text-xl font-bold text-green-600">
-        R$ {dashboard.total_recebido.toFixed(2)}
-      </p>
-    </div>
+            <div className="bg-white rounded-xl shadow p-3 text-sm">
+              <p className="text-gray-500">Alunos</p>
+              <p className="text-xl font-bold text-primary">
+                {dashboard.total_alunos}
+              </p>
+            </div>
 
-    <div className="bg-white rounded-xl shadow p-3 text-sm">
-      <p className="text-gray-500">Total a realizar</p>
-      <p className="text-xl font-bold text-primary">
-        R$ {dashboard.total_a_realizar.toFixed(2)}
-      </p>
-    </div>
+            <div className="bg-white rounded-xl shadow p-3 text-sm">
+              <p className="text-gray-500">Aulas realizadas</p>
+              <p className="text-xl font-bold text-green-600">
+                {dashboard.total_realizadas}
+              </p>
+            </div>
 
-  </div>
-)}
+            <div className="bg-white rounded-xl shadow p-3 text-sm">
+              <p className="text-gray-500">Total recebido</p>
+              <p className="text-xl font-bold text-green-600">
+                {formatarMoeda(dashboard.total_recebido)}
+              </p>
+            </div>
+
+            <div className="bg-white rounded-xl shadow p-3 text-sm">
+              <p className="text-gray-500">Total a realizar</p>
+              <p className="text-xl font-bold text-primary">
+                {formatarMoeda(dashboard.total_a_realizar)}
+              </p>
+            </div>
+
+          </div>
+        )}
 
         {/* 🔹 Botão Novo Aluno */}
         <div>
