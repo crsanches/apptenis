@@ -20,16 +20,17 @@ function ExtratoAluno({ aluno }) {
 
   const carregarExtrato = async () => {
     if (!aluno) return;
-
+  
     setLoading(true);
-
+  
     try {
-      const res = await fetch(
-        `${API_URL}/extrato/${aluno.id}`);
+      const res = await fetch(`${API_URL}/extrato/${aluno.id}`);
       const data = await res.json();
-      setExtrato(data);
+  
+      setExtrato(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Erro ao carregar extrato:", err);
+      setExtrato([]);
     } finally {
       setLoading(false);
     }
@@ -44,6 +45,10 @@ function ExtratoAluno({ aluno }) {
       style: "currency",
       currency: "BRL",
     });
+  };
+
+  const formatarNumero = (valor) => {
+    return (valor ?? 0).toLocaleString("pt-BR");
   };
 
   const corLinha = (item) => {
@@ -179,7 +184,7 @@ function ExtratoAluno({ aluno }) {
     <div>
       💰 Pago:
       <span className="font-semibold ml-1">
-        {formatarMoeda(totalPagoMes)}
+        {formatarNumero(totalPagoMes)}
       </span>
     </div>
 
@@ -284,12 +289,12 @@ function ExtratoAluno({ aluno }) {
 
     {/* 🔹 Débito */}
     <div className="text-red-600 text-center">
-      {item.debito ? formatarMoeda(item.debito) : "-"}
+      {item.debito ? formatarNumero(item.debito) : "-"}
     </div>
 
     {/* 🔹 Crédito */}
     <div className="text-green-600 text-center">
-      {item.credito ? formatarMoeda(item.credito) : "-"}
+      {item.credito ? formatarNumero(item.credito) : "-"}
     </div>
 
     {/* 🔹 Saldo */}
@@ -300,7 +305,7 @@ function ExtratoAluno({ aluno }) {
           : "text-red-600 font-semibold"
       }`}
     >
-      {formatarMoeda(item.saldo)}
+      {formatarNumero(item.saldo)}
     </div>
 
     {/* 🔹 Excluir */}
