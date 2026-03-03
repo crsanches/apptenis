@@ -372,17 +372,6 @@ router.get("/dashboard/:mes", (req, res) => {
   );
 });
 
-// teste de consistencia depois de apagar tudo e restar um sem saber de onde veio
-
-router.get("/debug", (req, res) => {
-  db.all("SELECT * FROM pagamentos", [], (err, pagamentos) => {
-    db.all("SELECT * FROM aulas", [], (err2, aulas) => {
-      db.all("SELECT * FROM alunos", [], (err3, alunos) => {
-        res.json({ alunos, pagamentos, aulas });
-      });
-    });
-  });
-});
 
 
 
