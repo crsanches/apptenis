@@ -24,8 +24,7 @@ function ResumoProfessor({ voltar, aulas = [], pagamentos = [] }) {
 
   // ---------- TOTAIS ----------
   const totalRecebido = pagamentosFiltrados
-    .filter(p => p.status === "pago")
-    .reduce((acc, p) => acc + Number(p.valor), 0);
+  .reduce((acc, p) => acc + Number(p.valor), 0);
 
   const totalPendente = pagamentosFiltrados
     .filter(p => p.status === "pendente")
