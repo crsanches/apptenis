@@ -9,7 +9,7 @@ const db = require("./db");
 
 router.get("/alunos", (req, res) => {
   db.all(
-    `SELECT id as aluno_id, nome, valor_aula FROM alunos`,
+    `SELECT id, nome, valor_aula FROM alunos`,
     [],
     (err, rows) => {
       if (err) return res.status(500).json(err);
