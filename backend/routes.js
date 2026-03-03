@@ -385,14 +385,6 @@ router.get("/debug", (req, res) => {
 });
 
 
-//apagando para restaurar
 
-router.get("/reset", (req, res) => {
-  db.run("DELETE FROM pagamentos");
-  db.run("DELETE FROM aulas");
-  db.run("DELETE FROM alunos");
-  res.json({ ok: true });
-});
 
-Acesse:
 module.exports = router;
