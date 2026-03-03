@@ -295,67 +295,58 @@ router.get("/saldo/:aluno_id", (req, res) => {
 
 router.get("/dashboard/:mes", (req, res) => {
   const mes = req.params.mes;
-
   const inicio = `${mes}-01`;
   const fim = `${mes}-31`;
 
-  const query = `
-    SELECT 
-      -- Alunos com movimento no mês
-      (
-        SELECT COUNT(DISTINCT aluno_id) FROM (
-          SELECT aluno_id FROM aulas
-          WHERE data_agendada BETWEEN ? AND ?
-          UNION
-          SELECT aluno_id FROM pagamentos
-          WHERE data BETWEEN ? AND ?
-        )
-      ) as total_alunos,
+  db.get(`
+    SELECT COUNT(*) as total_alunos
+    FROM alunos
+  `, [], (err, base) => {
 
-      -- Aulas realizadas
-      (
-        SELECT COUNT(*) FROM aulas 
-        WHERE status = 'realizada'
+    if (err) return res.status(500).json(err);
+
+    db.get(`
+      SELECT IFNULL(SUM(creditos_gerados),0) as creditos_gerados_mes
+      FROM pagamentos
+      WHERE data BETWEEN ? AND ?
+    `, [inicio, fim], (err2, gerados) => {
+
+      if (err2) return res.status(500).json(err2);
+
+      db.get(`
+        SELECT COUNT(*) as creditos_consumidos_mes
+        FROM aulas
+        WHERE status IN ('realizada','cancelada_sem_justificativa')
         AND data_agendada BETWEEN ? AND ?
-      ) as total_realizadas,
+      `, [inicio, fim], (err3, consumidos) => {
 
-      -- Total recebido
-      (
-        SELECT IFNULL(SUM(valor),0) FROM pagamentos 
-        WHERE data BETWEEN ? AND ?
-      ) as total_recebido,
+        if (err3) return res.status(500).json(err3);
 
-      -- Total consumido (realizadas + cancelada_sem_justificativa)
-      (
-  SELECT COUNT(*) FROM aulas 
-  WHERE status IN ('realizada','cancelada_sem_justificativa')
-  AND data_agendada BETWEEN ? AND ?
-) as total_consumido
-  `;
+        db.get(`
+          SELECT
+            IFNULL((SELECT SUM(creditos_gerados) FROM pagamentos),0)
+            -
+            IFNULL((
+              SELECT COUNT(*) FROM aulas
+              WHERE status IN ('realizada','cancelada_sem_justificativa')
+            ),0)
+          as creditos_acumulados_total
+        `, [], (err4, acumulado) => {
 
-  db.get(
-    query,
-    [
-      inicio, fim,
-      inicio, fim,
-      inicio, fim,
-      inicio, fim,
-      inicio, fim
-    ],
-    (err, row) => {
-      if (err) return res.status(500).json(err);
+          if (err4) return res.status(500).json(err4);
 
-     // const totalARealizar =
-     //   row.total_recebido - row.total_consumido;
-
-      res.json({
-        total_alunos: row.total_alunos,
-        total_realizadas: row.total_realizadas,
-        total_recebido: row.total_recebido,
-        total_a_realizar: totalARealizar
+          res.json({
+            total_alunos: base.total_alunos,
+            creditos_gerados_mes: gerados.creditos_gerados_mes,
+            creditos_consumidos_mes: consumidos.creditos_consumidos_mes,
+            creditos_abertos_mes:
+              gerados.creditos_gerados_mes - consumidos.creditos_consumidos_mes,
+            creditos_acumulados_total: acumulado.creditos_acumulados_total
+          });
+        });
       });
-    }
-  );
+    });
+  });
 });
 
 router.get("/resumo-professor/:mes", (req, res) => {
