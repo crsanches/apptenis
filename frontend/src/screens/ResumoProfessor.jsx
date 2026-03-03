@@ -84,7 +84,6 @@ function ResumoProfessor({ voltar, pagamentos = [] }) {
         onClick={voltar}
         className="text-secondary text-sm mb-4"
       >
-        ← Voltar
       </button>
 
       <h2 className="text-xl font-bold mb-6">
