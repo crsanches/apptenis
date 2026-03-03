@@ -308,30 +308,54 @@ router.get("/saldo/:aluno_id", (req, res) => {
 
 
 router.get("/dashboard/:mes", (req, res) => {
-  const mes = req.params.mes; // formato YYYY-MM
+  const mes = req.params.mes;
 
   const inicio = `${mes}-01`;
   const fim = `${mes}-31`;
 
   const query = `
     SELECT 
-      (SELECT COUNT(*) FROM alunos) as total_alunos,
+      -- Alunos com movimento no mês
+      (
+        SELECT COUNT(DISTINCT aluno_id) FROM (
+          SELECT aluno_id FROM aulas
+          WHERE data_agendada BETWEEN ? AND ?
+          UNION
+          SELECT aluno_id FROM pagamentos
+          WHERE data BETWEEN ? AND ?
+        )
+      ) as total_alunos,
 
-      (SELECT COUNT(*) FROM aulas 
+      -- Aulas realizadas
+      (
+        SELECT COUNT(*) FROM aulas 
         WHERE status = 'realizada'
-        AND data_agendada BETWEEN ? AND ?) as total_realizadas,
+        AND data_agendada BETWEEN ? AND ?
+      ) as total_realizadas,
 
-      (SELECT IFNULL(SUM(valor),0) FROM pagamentos 
-        WHERE data BETWEEN ? AND ?) as total_recebido,
+      -- Total recebido
+      (
+        SELECT IFNULL(SUM(valor),0) FROM pagamentos 
+        WHERE data BETWEEN ? AND ?
+      ) as total_recebido,
 
-      (SELECT IFNULL(SUM(valor_aula),0) FROM aulas 
-        WHERE status = 'realizada'
-        AND data_agendada BETWEEN ? AND ?) as total_consumido
+      -- Total consumido (realizadas + cancelada_sem_justificativa)
+      (
+        SELECT IFNULL(SUM(valor_aula),0) FROM aulas 
+        WHERE status IN ('realizada','cancelada_sem_justificativa')
+        AND data_agendada BETWEEN ? AND ?
+      ) as total_consumido
   `;
 
   db.get(
     query,
-    [inicio, fim, inicio, fim, inicio, fim],
+    [
+      inicio, fim,
+      inicio, fim,
+      inicio, fim,
+      inicio, fim,
+      inicio, fim
+    ],
     (err, row) => {
       if (err) return res.status(500).json(err);
 
