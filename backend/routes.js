@@ -95,6 +95,7 @@ router.post("/pagamentos", (req, res) => {
   );
 });
 
+
 router.delete("/pagamentos/:id", (req, res) => {
   db.run(
     `DELETE FROM pagamentos WHERE id = ?`,
