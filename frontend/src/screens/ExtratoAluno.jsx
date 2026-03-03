@@ -10,8 +10,12 @@ function ExtratoAluno({ aluno }) {
   const [modalPagamento, setModalPagamento] = useState(false);
   const [modalAula, setModalAula] = useState(false);
   const [loading, setLoading] = useState(false);
+  const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+
   const [mesSelecionado, setMesSelecionado] = useState(
-    new Date().toISOString().slice(0, 7)
+    `${ano}-${mes}`
   );
 
   const carregarExtrato = async () => {
@@ -229,8 +233,11 @@ function ExtratoAluno({ aluno }) {
   >
     {/* 🔹 Data */}
     <div>
-      {item.data_evento
-        ? new Date(item.data_evento).toLocaleDateString()
+          {item.data_evento
+        ? (() => {
+            const [ano, mes, dia] = item.data_evento.split("-");
+            return `${dia}/${mes}/${ano}`;
+          })()
         : "-"}
     </div>
 
