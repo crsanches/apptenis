@@ -124,8 +124,10 @@ function ResumoProfessor({ voltar, aulas = [], pagamentos = [] }) {
       <div className="bg-white p-4 rounded-xl shadow mb-8">
         <h3 className="font-semibold mb-4">Ganhos por Mês</h3>
 
-        <div style={{ width: "100%", height: 250 }}>
-          <ResponsiveContainer>
+        <div className="bg-white p-4 rounded-xl shadow mb-8">
+          <h3 className="font-semibold mb-4">Ganhos por Mês</h3>
+
+          <ResponsiveContainer width="100%" height={250}>
             <BarChart data={dadosGrafico}>
               <XAxis dataKey="mes" />
               <YAxis />
