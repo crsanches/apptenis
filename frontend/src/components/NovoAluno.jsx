@@ -3,8 +3,7 @@ import { API_URL } from "../config";
 
 function NovoAluno({ fechar }) {
   const [nome, setNome] = useState("");
-  const [valor, setValor] = useState("");
-  const [aulas, setAulas] = useState("");
+  const [valorAula, setValorAula] = useState("");
 
   const salvar = async () => {
     await fetch(`${API_URL}/alunos`, {
@@ -14,8 +13,7 @@ function NovoAluno({ fechar }) {
       },
       body: JSON.stringify({
         nome,
-        valor_mensal: Number(valor),
-        aulas_por_mes: Number(aulas)
+        valor_aula: Number(valorAula)
       })
     });
 
@@ -37,19 +35,11 @@ function NovoAluno({ fechar }) {
       />
 
       <input
-        placeholder="Valor mensal"
+        placeholder="Valor da aula"
         type="number"
         className="w-full border rounded-lg p-2"
-        value={valor}
-        onChange={e => setValor(e.target.value)}
-      />
-
-      <input
-        placeholder="Aulas por mês"
-        type="number"
-        className="w-full border rounded-lg p-2"
-        value={aulas}
-        onChange={e => setAulas(e.target.value)}
+        value={valorAula}
+        onChange={e => setValorAula(e.target.value)}
       />
 
       <button

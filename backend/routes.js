@@ -19,12 +19,12 @@ router.get("/alunos", (req, res) => {
 });
 
 router.post("/alunos", (req, res) => {
-  const { nome, valor_mensal, aulas_por_mes } = req.body;
+  const { nome, valor_aula } = req.body;
 
   db.run(
-    `INSERT INTO alunos (nome, valor_mensal, aulas_por_mes)
-     VALUES (?, ?, ?)`,
-    [nome, valor_mensal, aulas_por_mes],
+    `INSERT INTO alunos (nome, valor_aula)
+     VALUES (?, ?)`,
+    [nome, valor_aula],
     function (err) {
       if (err) return res.status(500).json(err);
       res.json({ id: this.lastID });
@@ -72,13 +72,25 @@ router.delete("/alunos/:id", (req, res) => {
 router.post("/pagamentos", (req, res) => {
   const { aluno_id, valor, data } = req.body;
 
-  db.run(
-    `INSERT INTO pagamentos (aluno_id, valor, data)
-     VALUES (?, ?, ?)`,
-    [aluno_id, valor, data],
-    function (err) {
+  db.get(
+    `SELECT valor_aula FROM alunos WHERE id = ?`,
+    [aluno_id],
+    (err, aluno) => {
       if (err) return res.status(500).json(err);
-      res.json({ id: this.lastID });
+      if (!aluno) return res.status(404).json({ error: "Aluno não encontrado" });
+
+      const creditos = valor / aluno.valor_aula;
+
+      db.run(
+        `INSERT INTO pagamentos 
+         (aluno_id, valor, data, valor_aula_na_epoca, creditos_gerados)
+         VALUES (?, ?, ?, ?, ?)`,
+        [aluno_id, valor, data, aluno.valor_aula, creditos],
+        function (err2) {
+          if (err2) return res.status(500).json(err2);
+          res.json({ id: this.lastID });
+        }
+      );
     }
   );
 });
@@ -372,6 +384,52 @@ router.get("/dashboard/:mes", (req, res) => {
   );
 });
 
+router.get("/resumo-professor/:mes", (req, res) => {
+  const mes = req.params.mes;
+  const inicio = `${mes}-01`;
+  const fim = `${mes}-31`;
+
+  const query = `
+    SELECT 
+      COUNT(*) as total_alunos
+    FROM alunos
+  `;
+
+  db.get(query, [], (err, base) => {
+    if (err) return res.status(500).json(err);
+
+    db.all(`
+      SELECT aluno_id, nome,
+        (
+          IFNULL(
+            (SELECT SUM(creditos_gerados) 
+             FROM pagamentos 
+             WHERE pagamentos.aluno_id = alunos.id), 0
+          )
+          -
+          IFNULL(
+            (SELECT COUNT(*) 
+             FROM aulas 
+             WHERE aulas.aluno_id = alunos.id
+             AND status IN ('realizada','cancelada_sem_justificativa')
+            ), 0
+          )
+        ) as creditos_abertos
+      FROM alunos
+    `, [], (err2, porAluno) => {
+
+      const totalAbertos = porAluno.reduce(
+        (acc, a) => acc + a.creditos_abertos, 0
+      );
+
+      res.json({
+        total_alunos: base.total_alunos,
+        creditos_acumulados_total: totalAbertos,
+        abertos_por_aluno: porAluno
+      });
+    });
+  });
+});
 
 
 
