@@ -129,7 +129,7 @@ function ResumoProfessor({ voltar, pagamentos = [] }) {
             <XAxis dataKey="mes" />
             <YAxis />
             <Tooltip />
-            <Bar dataKey="valor" />
+            <Bar dataKey="valor" fill="#16a34a" />
           </BarChart>
         </ResponsiveContainer>
       </div>
