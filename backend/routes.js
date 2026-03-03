@@ -175,7 +175,7 @@ router.get("/extrato/:aluno_id", (req, res) => {
     SELECT 
       id,
       data as data_evento,
-      valor,
+      creditos_gerados as quantidade,
       'pagamento' as tipo
     FROM pagamentos
     WHERE aluno_id = ?
@@ -185,18 +185,10 @@ router.get("/extrato/:aluno_id", (req, res) => {
     SELECT 
       id,
       data_agendada as data_evento,
-      valor_aula as valor,
       status,
       'aula' as tipo
     FROM aulas
     WHERE aluno_id = ?
-    AND status IN (
-      'agendada',
-      'realizada',
-      'cancelada_sem_justificativa',
-      'cancelada_pelo_professor',
-      'cancelada_com_justificativa'
-    )
   `;
 
   db.all(queryPagamentos, [alunoId], (err, pagamentos) => {
@@ -218,29 +210,31 @@ router.get("/extrato/:aluno_id", (req, res) => {
       const extrato = eventos.map(e => {
 
         if (e.tipo === "pagamento") {
-          saldo += e.valor;
+          saldo += e.quantidade;
+
           return {
             ...e,
-            credito: e.valor,
+            credito: e.quantidade,
             debito: 0,
             saldo
           };
         }
-        // aulas que descontam saldo
+
         if (
           e.status === "realizada" ||
           e.status === "cancelada_sem_justificativa"
         ) {
-          saldo -= e.valor;
+          saldo -= 1;
+
           return {
             ...e,
             credito: 0,
-            debito: e.valor,
+            debito: 1,
             saldo
           };
         }
 
-        // Aula agendada (não afeta saldo)
+        // aula que ainda não consome crédito
         return {
           ...e,
           credito: 0,
