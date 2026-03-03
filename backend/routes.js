@@ -111,6 +111,24 @@ router.delete("/pagamentos/:id", (req, res) => {
 // 🔹 AULAS
 // ==================================================
 
+router.get("/aulas", (req, res) => {
+  db.all(
+    `SELECT 
+        aulas.id,
+        aulas.data_agendada,
+        aulas.status,
+        alunos.nome as aluno_nome
+     FROM aulas
+     JOIN alunos ON alunos.id = aulas.aluno_id
+     ORDER BY aulas.data_agendada DESC`,
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json(err);
+      res.json(rows);
+    }
+  );
+});
+
 router.post("/aulas", (req, res) => {
   const { aluno_id, data_agendada } = req.body;
 
