@@ -8,8 +8,11 @@ function Agenda() {
   const [alunos, setAlunos] = useState([]);
 
   const hoje = new Date();
+  const ano = hoje.getFullYear();
+  const mes = String(hoje.getMonth() + 1).padStart(2, "0");
+
   const [mesSelecionado, setMesSelecionado] = useState(
-    hoje.toISOString().slice(0, 7)
+    `${ano}-${mes}`
   );
 
   const [filtroAluno, setFiltroAluno] = useState("todos");
@@ -41,14 +44,16 @@ function Agenda() {
     carregar();
   };
 
-  const formatarData = (data) =>
-    new Date(data).toLocaleDateString();
+  const formatarData = (data) => {
+    const [ano, mes, dia] = data.split("-");
+    return `${dia}/${mes}/${ano}`;
+  };
 
-  const formatarHora = (data) =>
-    new Date(data).toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit"
-    });
+  //const formatarHora = (data) =>
+  //  new Date(data).toLocaleTimeString([], {
+  //    hour: "2-digit",
+  //    minute: "2-digit"
+  //  });
 
   // 🔹 Filtro por mês
   const aulasMes = aulas.filter(a =>
@@ -63,7 +68,7 @@ function Agenda() {
 
   // 🔹 Ordenar por data
   const aulasOrdenadas = [...aulasFiltradas].sort(
-    (a, b) => new Date(a.data_agendada) - new Date(b.data_agendada)
+    (a, b) => a.data_agendada.localeCompare(b.data_agendada)
   );
 
   // 📊 Resumo mensal
