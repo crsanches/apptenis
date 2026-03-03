@@ -47,59 +47,64 @@ function App() {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 max-w-xl mx-auto">
-
-      {/* Header */}
+  
+      {/* 🔹 Header */}
       <div className="mb-6">
 
-      {tela === "menu" && (
-  <div className="space-y-6">
-
-    <button
-      onClick={irParaResumo}
-      className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-semibold"
-    >
-      📊 Resumo do Professor
-    </button>
-
-    <button
-      onClick={irParaControle}
-      className="w-full bg-green-600 text-white py-4 rounded-xl text-lg font-semibold"
-    >
-      🎾 Controle de Aulas
-    </button>
-
-  </div>
-)}
-
-        {tela === "extrato" && (
+        <h1 className="text-2xl font-bold text-primary center">
+                Controle de Aulas 🎾
+        </h1>
+        {tela !== "menu" && (
           <button
-            onClick={voltarDashboard}
+            onClick={
+              tela === "extrato"
+                ? irParaControle
+                : irParaMenu
+            }
             className="text-secondary text-sm mb-2"
           >
             ← Voltar
           </button>
         )}
-
-        <h1 className="text-2xl font-bold text-primary">
-          Controle de Aulas 🎾
-        </h1>
-
+  
+        
+  
       </div>
-
-      {/* Renderização das telas */}
-
+  
+      {/* 🔹 Conteúdo */}
+  
+      {tela === "menu" && (
+        <div className="space-y-6">
+  
+          <button
+            onClick={irParaResumo}
+            className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-semibold"
+          >
+            📊 Resumo do Professor
+          </button>
+  
+          <button
+            onClick={irParaControle}
+            className="w-full bg-green-600 text-white py-4 rounded-xl text-lg font-semibold"
+          >
+            🎾 Controle de Aulas
+          </button>
+  
+        </div>
+      )}
+  
       {tela === "resumo" && (
-        <ResumoProfessor voltar={irParaMenu} />
+        <ResumoProfessor />
       )}
       
       {tela === "controle" && (
         <Dashboard abrirExtrato={abrirExtrato} />
       )}
-
+  
       {tela === "extrato" && alunoSelecionado && (
         <ExtratoAluno aluno={alunoSelecionado} />
       )}
-
+  
     </div>
   );
 }
