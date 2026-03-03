@@ -372,4 +372,27 @@ router.get("/dashboard/:mes", (req, res) => {
   );
 });
 
+// teste de consistencia depois de apagar tudo e restar um sem saber de onde veio
+
+router.get("/debug", (req, res) => {
+  db.all("SELECT * FROM pagamentos", [], (err, pagamentos) => {
+    db.all("SELECT * FROM aulas", [], (err2, aulas) => {
+      db.all("SELECT * FROM alunos", [], (err3, alunos) => {
+        res.json({ alunos, pagamentos, aulas });
+      });
+    });
+  });
+});
+
+
+//apagando para restaurar
+
+router.get("/reset", (req, res) => {
+  db.run("DELETE FROM pagamentos");
+  db.run("DELETE FROM aulas");
+  db.run("DELETE FROM alunos");
+  res.json({ ok: true });
+});
+
+Acesse:
 module.exports = router;
