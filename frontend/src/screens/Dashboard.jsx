@@ -98,39 +98,46 @@ function Dashboard({ abrirExtrato }) {
         </div>
 
         {/* 🔹 Painel Resumo */}
-        {dashboard && (
-          <div className="grid grid-cols-2 gap-3">
+{dashboard && (
+  <div className="grid grid-cols-2 gap-3">
 
-            <div className="bg-white rounded-xl shadow p-3 text-sm">
-              <p className="text-gray-500">Alunos</p>
-              <p className="text-xl font-bold text-primary">
-                {dashboard.total_alunos}
-              </p>
-            </div>
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Alunos</p>
+      <p className="text-xl font-bold text-primary">
+        {dashboard.total_alunos}
+      </p>
+    </div>
 
-            <div className="bg-white rounded-xl shadow p-3 text-sm">
-              <p className="text-gray-500">Aulas realizadas</p>
-              <p className="text-xl font-bold text-green-600">
-                {dashboard.total_realizadas}
-              </p>
-            </div>
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Créditos gerados no mês</p>
+      <p className="text-xl font-bold text-green-600">
+        {dashboard.creditos_gerados_mes ?? 0}
+      </p>
+    </div>
 
-            <div className="bg-white rounded-xl shadow p-3 text-sm">
-              <p className="text-gray-500">Total recebido</p>
-              <p className="text-xl font-bold text-green-600">
-                {formatarMoeda(dashboard.total_recebido)}
-              </p>
-            </div>
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Créditos consumidos no mês</p>
+      <p className="text-xl font-bold text-red-600">
+        {dashboard.creditos_consumidos_mes ?? 0}
+      </p>
+    </div>
 
-            <div className="bg-white rounded-xl shadow p-3 text-sm">
-              <p className="text-gray-500">Total a realizar</p>
-              <p className="text-xl font-bold text-primary">
-                {formatarMoeda(dashboard.total_a_realizar)}
-              </p>
-            </div>
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Créditos em aberto no mês</p>
+      <p className="text-xl font-bold text-primary">
+        {dashboard.creditos_abertos_mes ?? 0}
+      </p>
+    </div>
 
-          </div>
-        )}
+    <div className="bg-white rounded-xl shadow p-3 text-sm col-span-2">
+      <p className="text-gray-500">Créditos acumulados totais</p>
+      <p className="text-2xl font-bold text-blue-600">
+        {dashboard.creditos_acumulados_total ?? 0}
+      </p>
+    </div>
+
+  </div>
+)}
 
         {/* 🔹 Botão Novo Aluno */}
         <div>
@@ -162,9 +169,9 @@ function Dashboard({ abrirExtrato }) {
                 </h2>
 
                 <p className="text-sm text-gray-500">
-                  Aulas mensais contratadas:{" "}
+                  Valor da aula:
                   <span className="font-semibold">
-                    {aluno.aulas_por_mes}
+                    R$ {aluno.valor_aula}
                   </span>
                 </p>
 
@@ -173,7 +180,7 @@ function Dashboard({ abrirExtrato }) {
                     saldo
                   )}`}
                 >
-                  Saldo atual: {formatarMoeda(saldo)}
+                  Créditos disponíveis: {saldo}
                 </p>
 
                 <div className="flex flex-wrap gap-2 mt-4">
