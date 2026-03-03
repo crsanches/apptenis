@@ -8,88 +8,92 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-function ResumoProfessor({ voltar, aulas = [], pagamentos = [] }) {
+function ResumoProfessor({ voltar, pagamentos = [] }) {
 
   const [mesSelecionado, setMesSelecionado] = useState("");
 
-  // ---------- FILTRAR POR MÊS ----------
+  // ===============================
+  // FILTRAR PAGAMENTOS POR MÊS
+  // ===============================
   const pagamentosFiltrados = useMemo(() => {
     if (!mesSelecionado) return pagamentos;
 
-    return pagamentos.filter(p => {
-      const mesPagamento = p.data.slice(0, 7); // YYYY-MM
-      return mesPagamento === mesSelecionado;
-    });
+    return pagamentos.filter(p =>
+      p.data?.slice(0, 7) === mesSelecionado
+    );
   }, [pagamentos, mesSelecionado]);
 
-  // ---------- TOTAIS ----------
-  const totalRecebido = pagamentosFiltrados
-  .reduce((acc, p) => acc + Number(p.valor), 0);
+  // ===============================
+  // TOTAL RECEBIDO (SEM STATUS)
+  // ===============================
+  const totalRecebido = useMemo(() => {
+    return pagamentosFiltrados.reduce(
+      (acc, p) => acc + Number(p.valor || 0),
+      0
+    );
+  }, [pagamentosFiltrados]);
 
-  const totalPendente = pagamentosFiltrados
-    .filter(p => p.status === "pendente")
-    .reduce((acc, p) => acc + Number(p.valor), 0);
-
-  // ---------- GRÁFICO POR MÊS ----------
+  // ===============================
+  // DADOS PARA O GRÁFICO (POR MÊS)
+  // ===============================
   const dadosGrafico = useMemo(() => {
     const mapa = {};
 
     pagamentos.forEach(p => {
-      const mes = p.data.slice(0, 7);
+      const mes = p.data?.slice(0, 7);
+      if (!mes) return;
 
       if (!mapa[mes]) mapa[mes] = 0;
-
-      if (p.status === "pago") {
-        mapa[mes] += Number(p.valor);
-      }
+      mapa[mes] += Number(p.valor || 0);
     });
 
-    return Object.keys(mapa).map(mes => ({
-      mes,
-      valor: mapa[mes]
-    }));
+    return Object.keys(mapa)
+      .sort()
+      .map(mes => ({
+        mes,
+        valor: mapa[mes]
+      }));
   }, [pagamentos]);
 
-  // ---------- RESUMO POR ALUNO ----------
+  // ===============================
+  // RESUMO POR ALUNO
+  // ===============================
   const resumoPorAluno = useMemo(() => {
     const mapa = {};
 
     pagamentosFiltrados.forEach(p => {
-      if (!mapa[p.aluno]) {
-        mapa[p.aluno] = {
-          total: 0,
-          recebido: 0,
-          pendente: 0
-        };
-      }
+      const nome = p.aluno_nome || "Aluno";
 
-      mapa[p.aluno].total += Number(p.valor);
-
-      if (p.status === "pago") {
-        mapa[p.aluno].recebido += Number(p.valor);
-      } else {
-        mapa[p.aluno].pendente += Number(p.valor);
-      }
+      if (!mapa[nome]) mapa[nome] = 0;
+      mapa[nome] += Number(p.valor || 0);
     });
 
-    return Object.entries(mapa).map(([aluno, dados]) => ({
-      aluno,
-      ...dados
-    }));
+    return Object.entries(mapa)
+      .map(([aluno, total]) => ({
+        aluno,
+        total
+      }))
+      .sort((a, b) => b.total - a.total);
   }, [pagamentosFiltrados]);
 
   return (
     <div className="p-4">
 
-      <button onClick={voltar} className="text-secondary text-sm mb-4">
+      {/* BOTÃO VOLTAR */}
+      <button
+        onClick={voltar}
+        className="text-secondary text-sm mb-4"
+      >
         ← Voltar
       </button>
 
-      <h2 className="text-xl font-bold mb-4">
-        Resumo do Professor
+      <h2 className="text-xl font-bold mb-6">
+        Resumo Financeiro do Professor
       </h2>
 
-      {/* FILTRO */}
+      {/* ===============================
+          FILTRO POR MÊS
+      =============================== */}
       <div className="mb-6">
         <label className="text-sm mr-2">Filtrar por mês:</label>
         <input
@@ -100,71 +104,61 @@ function ResumoProfessor({ voltar, aulas = [], pagamentos = [] }) {
         />
       </div>
 
-      {/* TOTAIS */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-
-        <div className="bg-green-50 p-4 rounded-xl shadow">
-          <p className="text-sm text-gray-500">Total Recebido</p>
-          <p className="text-xl font-bold text-green-600">
-            R$ {totalRecebido.toFixed(2)}
-          </p>
-        </div>
-
-        <div className="bg-red-50 p-4 rounded-xl shadow">
-          <p className="text-sm text-gray-500">Total Pendente</p>
-          <p className="text-xl font-bold text-red-600">
-            R$ {totalPendente.toFixed(2)}
-          </p>
-        </div>
-
+      {/* ===============================
+          TOTAL RECEBIDO
+      =============================== */}
+      <div className="bg-green-50 p-4 rounded-xl shadow mb-8">
+        <p className="text-sm text-gray-500">
+          Total Recebido {mesSelecionado && `( ${mesSelecionado} )`}
+        </p>
+        <p className="text-2xl font-bold text-green-600">
+          R$ {totalRecebido.toFixed(2)}
+        </p>
       </div>
 
-      {/* GRÁFICO */}
-      <div className="bg-white p-4 rounded-xl shadow mb-8">
-        <h3 className="font-semibold mb-4">Ganhos por Mês</h3>
+      {/* ===============================
+          GRÁFICO
+      =============================== */}
+      <div className="bg-white p-4 rounded-xl shadow mb-10">
+        <h3 className="font-semibold mb-4">
+          Ganhos por Mês
+        </h3>
 
-        <div className="bg-white p-4 rounded-xl shadow mb-8">
-          <h3 className="font-semibold mb-4">Ganhos por Mês</h3>
-
-          <ResponsiveContainer width="100%" height={250}>
-            <BarChart data={dadosGrafico}>
-              <XAxis dataKey="mes" />
-              <YAxis />
-              <Tooltip />
-              <Bar dataKey="valor" />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        <ResponsiveContainer width="100%" height={250}>
+          <BarChart data={dadosGrafico}>
+            <XAxis dataKey="mes" />
+            <YAxis />
+            <Tooltip />
+            <Bar dataKey="valor" />
+          </BarChart>
+        </ResponsiveContainer>
       </div>
 
-      {/* RESUMO POR ALUNO */}
+      {/* ===============================
+          RESUMO POR ALUNO
+      =============================== */}
       <div>
-        <h3 className="font-semibold mb-4">Resumo por Aluno</h3>
+        <h3 className="font-semibold mb-4">
+          Receita por Aluno
+        </h3>
 
         {resumoPorAluno.length === 0 && (
           <p className="text-gray-500 text-sm">
-            Nenhum registro encontrado.
+            Nenhum pagamento registrado.
           </p>
         )}
 
         {resumoPorAluno.map((a, index) => (
           <div
             key={index}
-            className="border-b py-3 flex flex-col md:flex-row md:justify-between"
+            className="border-b py-3 flex justify-between"
           >
-            <span className="font-medium">{a.aluno}</span>
-
-            <div className="text-sm mt-1 md:mt-0">
-              <span className="mr-4">
-                Total: R$ {a.total.toFixed(2)}
-              </span>
-              <span className="text-green-600 mr-4">
-                Recebido: R$ {a.recebido.toFixed(2)}
-              </span>
-              <span className="text-red-600">
-                Pendente: R$ {a.pendente.toFixed(2)}
-              </span>
-            </div>
+            <span className="font-medium">
+              {a.aluno}
+            </span>
+            <span className="text-green-600 font-medium">
+              R$ {a.total.toFixed(2)}
+            </span>
           </div>
         ))}
       </div>

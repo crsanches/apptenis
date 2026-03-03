@@ -96,6 +96,25 @@ router.post("/pagamentos", (req, res) => {
 });
 
 
+router.get("/pagamentos", (req, res) => {
+  db.all(
+    `SELECT 
+       pagamentos.id,
+       pagamentos.valor,
+       pagamentos.data,
+       pagamentos.aluno_id,
+       alunos.nome as aluno_nome
+     FROM pagamentos
+     JOIN alunos ON alunos.id = pagamentos.aluno_id
+     ORDER BY pagamentos.data DESC`,
+    [],
+    (err, rows) => {
+      if (err) return res.status(500).json(err);
+      res.json(rows);
+    }
+  );
+});
+
 router.delete("/pagamentos/:id", (req, res) => {
   db.run(
     `DELETE FROM pagamentos WHERE id = ?`,
