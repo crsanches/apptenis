@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import Dashboard from "./screens/Dashboard";
 import ExtratoAluno from "./screens/ExtratoAluno";
 import ResumoProfessor from "./screens/ResumoProfessor";
-import { useState, useEffect } from "react";
 import { API_URL } from "./config";
 
 function App() {
