@@ -11,8 +11,8 @@ function Dashboard({ abrirExtrato }) {
   const [modalNovo, setModalNovo] = useState(false);
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [dashboard, setDashboard] = useState(null);
 
-  console.log(API_URL);
   const carregar = async () => {
     try {
       setLoading(true);
@@ -48,6 +48,12 @@ function Dashboard({ abrirExtrato }) {
     carregar();
   }, []);
 
+  useEffect(() => {
+    fetch(`${API_URL}/dashboard/${mesSelecionado}`)
+      .then(res => res.json())
+      .then(data => setDashboard(data));
+  }, [mesSelecionado]);
+
   const corSaldo = (saldo) => {
     if (saldo > 0) return "text-green-600";
     if (saldo === 0) return "text-yellow-600";
@@ -64,6 +70,40 @@ function Dashboard({ abrirExtrato }) {
   return (
     <>
       <div className="space-y-6 pb-20">
+
+      {dashboard && (
+  <div className="grid grid-cols-2 gap-3 mb-4">
+
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Alunos</p>
+      <p className="text-xl font-bold text-primary">
+        {dashboard.total_alunos}
+      </p>
+    </div>
+
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Aulas realizadas</p>
+      <p className="text-xl font-bold text-green-600">
+        {dashboard.total_realizadas}
+      </p>
+    </div>
+
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Total recebido</p>
+      <p className="text-xl font-bold text-green-600">
+        R$ {dashboard.total_recebido.toFixed(2)}
+      </p>
+    </div>
+
+    <div className="bg-white rounded-xl shadow p-3 text-sm">
+      <p className="text-gray-500">Total a realizar</p>
+      <p className="text-xl font-bold text-primary">
+        R$ {dashboard.total_a_realizar.toFixed(2)}
+      </p>
+    </div>
+
+  </div>
+)}
 
         {/* 🔹 Botão Novo Aluno */}
         <div>

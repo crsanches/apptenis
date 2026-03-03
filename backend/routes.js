@@ -301,4 +301,51 @@ router.get("/saldo/:aluno_id", (req, res) => {
 });
 
 
+// ==================================================
+// 🔹 RELATORIO DO PROFESSOR
+// ==================================================
+
+
+
+router.get("/dashboard/:mes", (req, res) => {
+  const mes = req.params.mes; // formato YYYY-MM
+
+  const inicio = `${mes}-01`;
+  const fim = `${mes}-31`;
+
+  const query = `
+    SELECT 
+      (SELECT COUNT(*) FROM alunos) as total_alunos,
+
+      (SELECT COUNT(*) FROM aulas 
+        WHERE status = 'realizada'
+        AND data_agendada BETWEEN ? AND ?) as total_realizadas,
+
+      (SELECT IFNULL(SUM(valor),0) FROM pagamentos 
+        WHERE data BETWEEN ? AND ?) as total_recebido,
+
+      (SELECT IFNULL(SUM(valor_aula),0) FROM aulas 
+        WHERE status = 'realizada'
+        AND data_agendada BETWEEN ? AND ?) as total_consumido
+  `;
+
+  db.get(
+    query,
+    [inicio, fim, inicio, fim, inicio, fim],
+    (err, row) => {
+      if (err) return res.status(500).json(err);
+
+      const totalARealizar =
+        row.total_recebido - row.total_consumido;
+
+      res.json({
+        total_alunos: row.total_alunos,
+        total_realizadas: row.total_realizadas,
+        total_recebido: row.total_recebido,
+        total_a_realizar: totalARealizar
+      });
+    }
+  );
+});
+
 module.exports = router;
