@@ -8,7 +8,7 @@ import {
   ResponsiveContainer
 } from "recharts";
 
-function ResumoProfessor({ voltar, pagamentos = [] }) {
+function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
 
   const [mesSelecionado, setMesSelecionado] = useState("");
 
@@ -59,22 +59,45 @@ function ResumoProfessor({ voltar, pagamentos = [] }) {
   // RESUMO POR ALUNO
   // ===============================
   const resumoPorAluno = useMemo(() => {
+
     const mapa = {};
-
+  
     pagamentosFiltrados.forEach(p => {
+  
       const nome = p.aluno_nome || "Aluno";
-
-      if (!mapa[nome]) mapa[nome] = 0;
-      mapa[nome] += Number(p.valor || 0);
+  
+      if (!mapa[nome]) {
+        mapa[nome] = {
+          aluno: nome,
+          total: 0,
+          creditos: 0,
+          realizadas: 0,
+          aRealizar: 0
+        };
+      }
+  
+      mapa[nome].total += Number(p.valor || 0);
+      mapa[nome].creditos += Number(p.creditos || 0);
+  
     });
-
-    return Object.entries(mapa)
-      .map(([aluno, total]) => ({
-        aluno,
-        total
-      }))
+  
+    aulas.forEach(a => {
+  
+      const nome = a.aluno_nome;
+      if (!mapa[nome]) return;
+  
+      if (a.status === "realizada") {
+        mapa[nome].realizadas += 1;
+      } else {
+        mapa[nome].aRealizar += 1;
+      }
+  
+    });
+  
+    return Object.values(mapa)
       .sort((a, b) => b.total - a.total);
-  }, [pagamentosFiltrados]);
+  
+  }, [pagamentosFiltrados, aulas]);
 
   return (
     <div className="p-4">
@@ -137,30 +160,57 @@ function ResumoProfessor({ voltar, pagamentos = [] }) {
           RESUMO POR ALUNO
       =============================== */}
       <div>
-        <h3 className="font-semibold mb-4">
-          Receita por Aluno
-        </h3>
+  <h3 className="font-semibold mb-4">
+    Resumo por Aluno
+  </h3>
 
-        {resumoPorAluno.length === 0 && (
-          <p className="text-gray-500 text-sm">
-            Nenhum pagamento registrado.
-          </p>
-        )}
+  <table className="w-full text-sm">
 
-        {resumoPorAluno.map((a, index) => (
-          <div
-            key={index}
-            className="border-b py-3 flex justify-between"
-          >
-            <span className="font-medium">
-              {a.aluno}
-            </span>
-            <span className="text-green-600 font-medium">
-              R$ {a.total.toFixed(2)}
-            </span>
-          </div>
-        ))}
-      </div>
+    <thead>
+      <tr className="border-b text-gray-600">
+        <th className="text-left py-2">Aluno</th>
+        <th>Créditos</th>
+        <th>Realizadas</th>
+        <th>A realizar</th>
+        <th className="text-right">Receita</th>
+      </tr>
+    </thead>
+
+    <tbody>
+
+      {resumoPorAluno.map((a, index) => (
+
+        <tr key={index} className="border-b">
+
+          <td className="py-2 font-medium">
+            {a.aluno}
+          </td>
+
+          <td className="text-center">
+            {a.creditos}
+          </td>
+
+          <td className="text-center">
+            {a.realizadas}
+          </td>
+
+          <td className="text-center">
+            {a.aRealizar}
+          </td>
+
+          <td className="text-right text-green-600 font-medium">
+            R$ {a.total.toFixed(2)}
+          </td>
+
+        </tr>
+
+      ))}
+
+    </tbody>
+
+  </table>
+
+</div>
 
     </div>
   );
