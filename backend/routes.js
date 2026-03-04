@@ -152,20 +152,23 @@ router.delete("/pagamentos/:id", async (req, res) => {
 
 router.get("/aulas", async (req, res) => {
   try {
+
     const result = await pool.query(`
-      SELECT 
+      SELECT
         au.id,
-        au.data_agendada,
+        au.data,
         au.status,
-        al.nome as aluno_nome
+        au.aluno_id,
+        a.nome AS aluno_nome
       FROM aulas au
-      JOIN alunos al ON al.id = au.aluno_id
-      ORDER BY au.data_agendada DESC
+      JOIN alunos a ON a.id = au.aluno_id
+      ORDER BY au.data
     `);
 
     res.json(result.rows);
+
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ erro: "Erro ao buscar aulas" });
   }
 });
 
