@@ -111,20 +111,24 @@ router.post("/pagamentos", async (req, res) => {
 router.get("/pagamentos", async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT 
-        p.id,
-        p.valor,
-        p.data,
-        p.aluno_id,
-        a.nome as aluno_nome
-      FROM pagamentos p
-      JOIN alunos a ON a.id = p.aluno_id
-      ORDER BY p.data DESC
-    `);
+    SELECT 
+      p.id,
+      p.valor,
+      p.data,
+      p.aluno_id,
+      p.valor_aula_na_epoca,
+      p.creditos_gerados,
+      a.nome AS aluno_nome
+    FROM pagamentos p
+    JOIN alunos a ON a.id = p.aluno_id
+    ORDER BY p.data DESC
+  `);
 
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({
+      erro: "Erro ao buscar pagamentos"
+    });
   }
 });
 

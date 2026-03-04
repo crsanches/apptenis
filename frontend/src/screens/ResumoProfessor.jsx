@@ -66,36 +66,40 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
   
       const nome = p.aluno_nome || "Aluno";
   
-      if (!mapa[nome]) {
+      if(!mapa[nome]){
+  
         mapa[nome] = {
           aluno: nome,
-          total: 0,
+          receita: 0,
           creditos: 0,
-          realizadas: 0,
-          aRealizar: 0
+          realizadas: 0
         };
+  
       }
   
-      mapa[nome].total += Number(p.valor || 0);
-      mapa[nome].creditos += Number(p.creditos || 0);
+      mapa[nome].receita += Number(p.valor || 0);
+      mapa[nome].creditos += Number(p.creditos_gerados || 0);
   
     });
   
     aulas.forEach(a => {
   
       const nome = a.aluno_nome;
-      if (!mapa[nome]) return;
   
-      if (a.status === "realizada") {
+      if(!mapa[nome]) return;
+  
+      if(a.status === "realizada"){
         mapa[nome].realizadas += 1;
-      } else {
-        mapa[nome].aRealizar += 1;
       }
   
     });
   
     return Object.values(mapa)
-      .sort((a, b) => b.total - a.total);
+      .map(a => ({
+        ...a,
+        saldo: a.creditos - a.realizadas
+      }))
+      .sort((a,b) => b.receita - a.receita);
   
   }, [pagamentosFiltrados, aulas]);
 
