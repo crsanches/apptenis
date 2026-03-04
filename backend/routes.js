@@ -156,13 +156,13 @@ router.get("/aulas", async (req, res) => {
     const result = await pool.query(`
       SELECT
         au.id,
-        au.data,
+        au.data_agendada AS data,
         au.status,
         au.aluno_id,
         a.nome AS aluno_nome
       FROM aulas au
       JOIN alunos a ON a.id = au.aluno_id
-      ORDER BY au.data
+      ORDER BY au.data_agendada
     `);
 
     res.json(result.rows);

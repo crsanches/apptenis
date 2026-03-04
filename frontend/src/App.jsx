@@ -9,9 +9,10 @@ function App() {
   // ===============================
   // ESTADOS
   // ===============================
-  const [tela, setTela] = useState("menu"); // 🔥 Sempre começa no menu
+  const [tela, setTela] = useState("menu");
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
   const [pagamentos, setPagamentos] = useState([]);
+  const [aulas, setAulas] = useState([]);
 
   // ===============================
   // BUSCAR PAGAMENTOS
@@ -23,8 +24,22 @@ function App() {
       .catch(err => console.error("Erro ao buscar pagamentos:", err));
   };
 
+  // ===============================
+  // BUSCAR AULAS
+  // ===============================
+  const carregarAulas = () => {
+    fetch(`${API_URL}/aulas`)
+      .then(res => res.json())
+      .then(data => setAulas(data))
+      .catch(err => console.error("Erro ao buscar aulas:", err));
+  };
+
+  // ===============================
+  // CARREGAMENTO INICIAL
+  // ===============================
   useEffect(() => {
     carregarPagamentos();
+    carregarAulas();
   }, []);
 
   // ===============================
@@ -41,7 +56,8 @@ function App() {
   };
 
   const irParaResumo = () => {
-    carregarPagamentos(); // 🔥 Atualiza antes de abrir
+    carregarPagamentos();
+    carregarAulas();
     setTela("resumo");
   };
 
@@ -52,9 +68,7 @@ function App() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 max-w-xl mx-auto">
 
-      {/* ===============================
-          HEADER
-      =============================== */}
+      {/* HEADER */}
       <div className="mb-6">
 
         <h1 className="text-2xl font-bold text-primary text-center">
@@ -72,9 +86,7 @@ function App() {
 
       </div>
 
-      {/* ===============================
-          MENU
-      =============================== */}
+      {/* MENU */}
       {tela === "menu" && (
         <div className="space-y-6">
 
@@ -95,23 +107,20 @@ function App() {
         </div>
       )}
 
-      {/* ===============================
-          RESUMO
-      =============================== */}
+      {/* RESUMO */}
       {tela === "resumo" && (
-        <ResumoProfessor pagamentos={pagamentos} />
+        <ResumoProfessor
+          pagamentos={pagamentos}
+          aulas={aulas}
+        />
       )}
 
-      {/* ===============================
-          CONTROLE
-      =============================== */}
+      {/* CONTROLE */}
       {tela === "controle" && (
         <Dashboard abrirExtrato={abrirExtrato} />
       )}
 
-      {/* ===============================
-          EXTRATO
-      =============================== */}
+      {/* EXTRATO */}
       {tela === "extrato" && alunoSelecionado && (
         <ExtratoAluno aluno={alunoSelecionado} />
       )}

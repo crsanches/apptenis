@@ -97,10 +97,11 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
     aulasFiltradas.forEach(a => {
 
       const nome = a.aluno_nome;
-    
+      console.log("AULAS:", aulas);
+      console.log("PAGAMENTOS:", pagamentos);
       if (!mapa[nome]) return;
     
-      if (a.status === "realizada") {
+      if (a.status?.toLowerCase() === "realizada") {
         mapa[nome].realizadas += 1;
       } else {
         mapa[nome].aRealizar = (mapa[nome].aRealizar || 0) + 1;
@@ -115,7 +116,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
       }))
       .sort((a,b) => b.receita - a.receita);
   
-  }, [pagamentosFiltrados, aulas]);
+  }, [pagamentosFiltrados, aulasFiltradas]);
 
   return (
     <div className="p-4">
