@@ -138,7 +138,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
           Total Recebido {mesSelecionado && `( ${mesSelecionado} )`}
         </p>
         <p className="text-2xl font-bold text-green-600">
-          R$ {totalRecebido.toFixed(2)}
+        R$ {Number(totalRecebido || 0).toFixed(2)}
         </p>
       </div>
 
@@ -203,7 +203,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
           </td>
 
           <td className="text-right text-green-600 font-medium">
-            R$ {a.total.toFixed(2)}
+          R$ {Number(a.receita || 0).toFixed(2)}
           </td>
 
         </tr>
