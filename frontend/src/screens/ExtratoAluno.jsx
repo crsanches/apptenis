@@ -191,7 +191,7 @@ function ExtratoAluno({ aluno }) {
     <div>
       🎾 Consumido:
       <span className="font-semibold ml-1">
-        {formatarMoeda(totalConsumidoMes)}
+        {formatarNumero(totalConsumidoMes)}
       </span>
     </div>
 
@@ -205,7 +205,7 @@ function ExtratoAluno({ aluno }) {
     <div>
       🧮 Saldo:
       <span className="font-semibold ml-1">
-        {formatarMoeda(totalPagoMes - totalConsumidoMes)}
+        {formatarNumero(totalPagoMes - totalConsumidoMes)}
       </span>
     </div>
 

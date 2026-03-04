@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { API_URL } from "../config";
 
-function NovoAluno({ fechar }) {
+function NovoAluno({ fechar, atualizar}) {
   const [nome, setNome] = useState("");
   const [valorAula, setValorAula] = useState("");
 
@@ -17,8 +17,9 @@ function NovoAluno({ fechar }) {
       })
     });
 
+    atualizar();
     fechar();
-    window.location.reload();
+    
   };
 
   return (
