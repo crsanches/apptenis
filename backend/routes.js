@@ -242,4 +242,110 @@ router.get("/saldo/:aluno_id", async (req, res) => {
   }
 });
 
+
+router.get("/extrato/:aluno_id", async (req, res) => {
+  const alunoId = req.params.aluno_id;
+
+  try {
+    const pagamentos = await pool.query(`
+      SELECT 
+        id,
+        data as data_evento,
+        creditos_gerados as quantidade,
+        'pagamento' as tipo
+      FROM pagamentos
+      WHERE aluno_id = $1
+    `, [alunoId]);
+
+    const aulas = await pool.query(`
+      SELECT 
+        id,
+        data_agendada as data_evento,
+        status,
+        'aula' as tipo
+      FROM aulas
+      WHERE aluno_id = $1
+    `, [alunoId]);
+
+    const eventos = [...pagamentos.rows, ...aulas.rows];
+
+    eventos.sort(
+      (a, b) => new Date(a.data_evento) - new Date(b.data_evento)
+    );
+
+    let saldo = 0;
+
+    const extrato = eventos.map(e => {
+
+      if (e.tipo === "pagamento") {
+        saldo += Number(e.quantidade);
+        return { ...e, credito: Number(e.quantidade), debito: 0, saldo };
+      }
+
+      if (
+        e.status === "realizada" ||
+        e.status === "cancelada_sem_justificativa"
+      ) {
+        saldo -= 1;
+        return { ...e, credito: 0, debito: 1, saldo };
+      }
+
+      return { ...e, credito: 0, debito: 0, saldo };
+    });
+
+    res.json(extrato);
+
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+router.get("/dashboard/:mes", async (req, res) => {
+  const mes = req.params.mes;
+  const inicio = `${mes}-01`;
+  const fim = `${mes}-31`;
+
+  try {
+    const totalAlunos = await pool.query(
+      `SELECT COUNT(*) as total FROM alunos`
+    );
+
+    const gerados = await pool.query(`
+      SELECT COALESCE(SUM(creditos_gerados),0) as total
+      FROM pagamentos
+      WHERE data BETWEEN $1 AND $2
+    `, [inicio, fim]);
+
+    const consumidos = await pool.query(`
+      SELECT COUNT(*) as total
+      FROM aulas
+      WHERE status IN ('realizada','cancelada_sem_justificativa')
+      AND data_agendada BETWEEN $1 AND $2
+    `, [inicio, fim]);
+
+    const acumulado = await pool.query(`
+      SELECT
+        COALESCE((SELECT SUM(creditos_gerados) FROM pagamentos),0)
+        -
+        COALESCE((
+          SELECT COUNT(*) FROM aulas
+          WHERE status IN ('realizada','cancelada_sem_justificativa')
+        ),0)
+      as total
+    `);
+
+    res.json({
+      total_alunos: Number(totalAlunos.rows[0].total),
+      creditos_gerados_mes: Number(gerados.rows[0].total),
+      creditos_consumidos_mes: Number(consumidos.rows[0].total),
+      creditos_abertos_mes:
+        Number(gerados.rows[0].total) - Number(consumidos.rows[0].total),
+      creditos_acumulados_total: Number(acumulado.rows[0].total)
+    });
+
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
 module.exports = router;
