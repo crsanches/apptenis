@@ -24,6 +24,17 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
   }, [pagamentos, mesSelecionado]);
 
   // ===============================
+  // FILTRAR AULAS POR MÊS
+  // ===============================
+    const aulasFiltradas = useMemo(() => {
+      if (!mesSelecionado) return aulas;
+
+      return aulas.filter(a =>
+        a.data?.slice(0, 7) === mesSelecionado
+      );
+    }, [aulas, mesSelecionado]);
+
+  // ===============================
   // TOTAL RECEBIDO (SEM STATUS)
   // ===============================
   const totalRecebido = useMemo(() => {
@@ -72,7 +83,8 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
           aluno: nome,
           receita: 0,
           creditos: 0,
-          realizadas: 0
+          realizadas: 0,
+          aRealizar: 0
         };
   
       }
@@ -82,16 +94,18 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
   
     });
   
-    aulas.forEach(a => {
-  
+    aulasFiltradas.forEach(a => {
+
       const nome = a.aluno_nome;
-  
-      if(!mapa[nome]) return;
-  
-      if(a.status === "realizada"){
+    
+      if (!mapa[nome]) return;
+    
+      if (a.status === "realizada") {
         mapa[nome].realizadas += 1;
+      } else {
+        mapa[nome].aRealizar = (mapa[nome].aRealizar || 0) + 1;
       }
-  
+    
     });
   
     return Object.values(mapa)
@@ -111,6 +125,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
         onClick={voltar}
         className="text-secondary text-sm mb-4"
       >
+      ← Voltar
       </button>
 
       <h2 className="text-xl font-bold mb-6">
