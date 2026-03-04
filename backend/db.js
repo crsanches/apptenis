@@ -1,39 +1,52 @@
-const sqlite3 = require('sqlite3').verbose();
+const { Pool } = require('pg');
 
-const db = new sqlite3.Database('./database.sqlite');
-
-db.serialize(() => {
-
-  db.run(`
-  CREATE TABLE IF NOT EXISTS alunos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    nome TEXT NOT NULL,
-    valor_aula REAL NOT NULL
-  )
-`);
-
-  db.run(`
-  CREATE TABLE IF NOT EXISTS pagamentos (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    aluno_id INTEGER NOT NULL,
-    valor REAL NOT NULL,
-    data TEXT NOT NULL,
-    valor_aula_na_epoca REAL NOT NULL,
-    creditos_gerados REAL NOT NULL,
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id)
-  )
-`);
-
-  db.run(`
-  CREATE TABLE IF NOT EXISTS aulas (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    aluno_id INTEGER NOT NULL,
-    data_agendada TEXT NOT NULL,
-    status TEXT NOT NULL,
-    FOREIGN KEY (aluno_id) REFERENCES alunos(id)
-  )
-`);
-
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL
+    ? { rejectUnauthorized: false }
+    : false
 });
 
-module.exports = db;
+pool.connect()
+  .then(() => console.log("✅ PostgreSQL conectado"))
+  .catch(err => console.error("❌ Erro ao conectar:", err));
+
+  async function criarTabelas() {
+    try {
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS alunos (
+          id SERIAL PRIMARY KEY,
+          nome TEXT NOT NULL,
+          valor_aula NUMERIC NOT NULL
+        );
+      `);
+  
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS pagamentos (
+          id SERIAL PRIMARY KEY,
+          aluno_id INTEGER REFERENCES alunos(id),
+          valor NUMERIC NOT NULL,
+          data DATE NOT NULL,
+          valor_aula_na_epoca NUMERIC NOT NULL,
+          creditos_gerados NUMERIC NOT NULL
+        );
+      `);
+  
+      await pool.query(`
+        CREATE TABLE IF NOT EXISTS aulas (
+          id SERIAL PRIMARY KEY,
+          aluno_id INTEGER REFERENCES alunos(id),
+          data_agendada DATE NOT NULL,
+          status TEXT NOT NULL
+        );
+      `);
+  
+      console.log("✅ Tabelas criadas/verificadas");
+    } catch (err) {
+      console.error("❌ Erro ao criar tabelas:", err);
+    }
+  }
+  
+  criarTabelas();
+
+module.exports = pool;

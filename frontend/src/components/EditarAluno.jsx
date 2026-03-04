@@ -3,8 +3,7 @@ import { API_URL } from "../config";
 
 function EditarAluno({ aluno, fechar, atualizar }) {
   const [nome, setNome] = useState(aluno.nome);
-  const [valor, setValor] = useState(aluno.valor_mensal);
-  const [aulas, setAulas] = useState(aluno.aulas_por_mes);
+  const [valorAula, setValorAula] = useState(aluno.valor_aula);
 
   const salvar = async () => {
     await fetch(`${API_URL}/alunos/${aluno.id}`, {
@@ -12,8 +11,7 @@ function EditarAluno({ aluno, fechar, atualizar }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nome,
-        valor_mensal: Number(valor),
-        aulas_por_mes: Number(aulas)
+        valor_aula: Number(valorAula)
       })
     });
 
@@ -27,32 +25,45 @@ function EditarAluno({ aluno, fechar, atualizar }) {
         Editar Aluno
       </h2>
 
-      <input
-        className="w-full border rounded p-2"
-        value={nome}
-        onChange={e => setNome(e.target.value)}
-      />
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          Nome do aluno
+        </label>
+        <input
+          type="text"
+          className="w-full border rounded p-2"
+          value={nome}
+          onChange={e => setNome(e.target.value)}
+        />
+      </div>
 
-      <input
-        type="number"
-        className="w-full border rounded p-2"
-        value={valor}
-        onChange={e => setValor(e.target.value)}
-      />
+      <div>
+        <label className="block text-sm font-medium mb-1">
+          Valor por aula (R$)
+        </label>
+        <input
+          type="number"
+          className="w-full border rounded p-2"
+          value={valorAula}
+          onChange={e => setValorAula(e.target.value)}
+        />
+      </div>
 
-      <input
-        type="number"
-        className="w-full border rounded p-2"
-        value={aulas}
-        onChange={e => setAulas(e.target.value)}
-      />
+      <div className="flex gap-2">
+        <button
+          onClick={fechar}
+          className="w-1/2 border py-2 rounded"
+        >
+          Cancelar
+        </button>
 
-      <button
-        onClick={salvar}
-        className="w-full bg-primary text-white py-2 rounded"
-      >
-        Salvar
-      </button>
+        <button
+          onClick={salvar}
+          className="w-1/2 bg-primary text-white py-2 rounded"
+        >
+          Salvar
+        </button>
+      </div>
     </div>
   );
 }
