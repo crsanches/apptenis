@@ -156,7 +156,7 @@ router.get("/aulas", async (req, res) => {
     const result = await pool.query(`
       SELECT
         au.id,
-        au.TO_CHAR(data_agendada, 'YYYY-MM-DD') as data_evento,
+        au.data_agendada::date AS data,
         au.status,
         au.aluno_id,
         a.nome AS aluno_nome
@@ -168,6 +168,7 @@ router.get("/aulas", async (req, res) => {
     res.json(result.rows);
 
   } catch (err) {
+    console.error("Erro ao buscar aulas:", err);
     res.status(500).json({ erro: "Erro ao buscar aulas" });
   }
 });
@@ -262,7 +263,7 @@ router.get("/extrato/:aluno_id", async (req, res) => {
     const pagamentos = await pool.query(`
     SELECT 
       id,
-      TO_CHAR(data, 'YYYY-MM-DD') as data_evento,
+      data::date as data_evento,
       creditos_gerados as quantidade,
       valor,
       valor_aula_na_epoca,
@@ -274,7 +275,7 @@ router.get("/extrato/:aluno_id", async (req, res) => {
     const aulas = await pool.query(`
       SELECT 
         id,
-        data_agendada as data_evento,
+        data_agendada::date as data_evento,
         status,
         'aula' as tipo
       FROM aulas
