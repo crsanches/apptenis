@@ -125,6 +125,21 @@ function ExtratoAluno({ aluno }) {
           i.status === "cancelada_sem_justificativa")
       ).length;
 
+      const totalCreditosMes = movimentosMes
+        .filter((i) => i.tipo === "pagamento")
+        .reduce((acc, i) => acc + Number(i.quantidade || 0), 0);
+
+      const totalDebitosMes = movimentosMes
+        .filter(
+          (i) =>
+            i.tipo === "aula" &&
+            (i.status === "realizada" ||
+              i.status === "cancelada_sem_justificativa")
+        )
+        .length;
+
+      const saldoAulasMes = totalCreditosMes - totalDebitosMes;
+
   return (
     <>
       <div className="pb-20 space-y-4">
@@ -201,7 +216,7 @@ function ExtratoAluno({ aluno }) {
     </div>
 
     <div>
-      📊 Aulas:
+      📊 Aulas utilizadas:
       <span className="font-semibold ml-1">
         {totalAulasMes}
       </span>
@@ -210,7 +225,7 @@ function ExtratoAluno({ aluno }) {
     <div>
       🧮 Saldo:
       <span className="font-semibold ml-1">
-        {formatarNumero(totalPagoMes - totalConsumidoMes)}
+      {formatarNumero(saldoAulasMes)}
       </span>
     </div>
 
