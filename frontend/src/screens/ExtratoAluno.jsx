@@ -106,12 +106,23 @@ function ExtratoAluno({ aluno }) {
       );
 
       const totalPagoMes = movimentosMes
-        .filter((i) => i.credito > 0)
-        .reduce((acc, i) => acc + i.credito, 0);
+      .filter((i) => i.tipo === "pagamento")
+      .reduce(
+        (acc, i) => acc + Number(i.quantidade || 0) * Number(aluno.valor_aula || 0),
+        0
+      );
 
       const totalConsumidoMes = movimentosMes
-        .filter((i) => i.debito > 0)
-        .reduce((acc, i) => acc + i.debito, 0);
+      .filter(
+        (i) =>
+          i.tipo === "aula" &&
+          (i.status === "realizada" ||
+            i.status === "cancelada_sem_justificativa")
+      )
+      .reduce(
+        (acc) => acc + Number(aluno.valor_aula || 0),
+        0
+      );
 
       const totalAulasMes = movimentosMes.filter(
         (i) =>
@@ -184,14 +195,14 @@ function ExtratoAluno({ aluno }) {
     <div>
       💰 Pago:
       <span className="font-semibold ml-1">
-        {formatarNumero(totalPagoMes)}
+        {formatarMoeda(totalPagoMes)}
       </span>
     </div>
 
     <div>
       🎾 Consumido:
       <span className="font-semibold ml-1">
-        {formatarNumero(totalConsumidoMes)}
+        {formatarMoeda(totalConsumidoMes)}
       </span>
     </div>
 
