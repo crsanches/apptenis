@@ -152,11 +152,10 @@ router.delete("/pagamentos/:id", async (req, res) => {
 
 router.get("/aulas", async (req, res) => {
   try {
-
     const result = await pool.query(`
       SELECT
         au.id,
-        au.data_agendada::date AS data,
+        DATE(au.data_agendada) AS data,
         au.status,
         au.aluno_id,
         a.nome AS aluno_nome
