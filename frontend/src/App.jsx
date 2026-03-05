@@ -3,6 +3,8 @@ import Dashboard from "./screens/Dashboard";
 import ExtratoAluno from "./screens/ExtratoAluno";
 import ResumoProfessor from "./screens/ResumoProfessor";
 import { API_URL } from "./config";
+import Login from "./screens/Login";
+import { getToken, logout } from "./auth";
 
 function App() {
 
@@ -13,6 +15,7 @@ function App() {
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
   const [pagamentos, setPagamentos] = useState([]);
   const [aulas, setAulas] = useState([]);
+  const [usuario,setUsuario] = useState(null);
 
   // ===============================
   // BUSCAR PAGAMENTOS
@@ -45,6 +48,7 @@ function App() {
   // ===============================
   // NAVEGAÇÃO
   // ===============================
+
   const abrirExtrato = (aluno) => {
     setAlunoSelecionado(aluno);
     setTela("extrato");
@@ -65,26 +69,56 @@ function App() {
     setTela("controle");
   };
 
+  // ===============================
+  // LOGIN
+  // ===============================
+
+  if (!usuario) {
+    return <Login setUsuario={setUsuario} />;
+  }
+
+  // ===============================
+  // APP PRINCIPAL
+  // ===============================
+
   return (
     <div className="min-h-screen bg-gray-50 p-4 max-w-xl mx-auto">
 
       {/* HEADER */}
-      <div className="mb-6">
+      <div className="mb-6 flex justify-between items-center">
 
-        <h1 className="text-2xl font-bold text-primary text-center">
+        <h1 className="text-2xl font-bold text-primary">
           Controle de Aulas 🎾
         </h1>
 
-        {tela !== "menu" && (
+        <div className="flex items-center gap-3">
+
+          <span className="text-sm text-gray-600">
+            👤 {usuario.nome}
+          </span>
+
           <button
-            onClick={irParaMenu}
-            className="text-secondary text-sm mt-2"
+            onClick={()=>{
+              logout();
+              window.location.reload();
+            }}
+            className="text-red-600 text-sm"
           >
-            ← Voltar
+            Logout
           </button>
-        )}
+
+        </div>
 
       </div>
+
+      {tela !== "menu" && (
+        <button
+          onClick={irParaMenu}
+          className="text-secondary text-sm mb-4"
+        >
+          ← Voltar
+        </button>
+      )}
 
       {/* MENU */}
       {tela === "menu" && (
