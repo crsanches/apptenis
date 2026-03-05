@@ -255,13 +255,15 @@ router.get("/extrato/:aluno_id", async (req, res) => {
 
   try {
     const pagamentos = await pool.query(`
-      SELECT 
-        id,
-        data as data_evento,
-        creditos_gerados as quantidade,
-        'pagamento' as tipo
-      FROM pagamentos
-      WHERE aluno_id = $1
+    SELECT 
+      id,
+      data as data_evento,
+      creditos_gerados as quantidade,
+      valor,
+      valor_aula_na_epoca,
+      'pagamento' as tipo
+    FROM pagamentos
+    WHERE aluno_id = $1
     `, [alunoId]);
 
     const aulas = await pool.query(`

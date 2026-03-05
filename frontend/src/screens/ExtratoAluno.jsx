@@ -107,11 +107,8 @@ function ExtratoAluno({ aluno }) {
 
       const totalPagoMes = movimentosMes
       .filter((i) => i.tipo === "pagamento")
-      .reduce(
-        (acc, i) => acc + Number(i.quantidade || 0) * Number(aluno.valor_aula || 0),
-        0
-      );
-
+      .reduce((acc, i) => acc + Number(i.valor || 0), 0);
+      
       const totalConsumidoMes = movimentosMes
       .filter(
         (i) =>
@@ -119,10 +116,7 @@ function ExtratoAluno({ aluno }) {
           (i.status === "realizada" ||
             i.status === "cancelada_sem_justificativa")
       )
-      .reduce(
-        (acc) => acc + Number(aluno.valor_aula || 0),
-        0
-      );
+      .reduce((acc) => acc + Number(aluno.valor_aula || 0), 0);
 
       const totalAulasMes = movimentosMes.filter(
         (i) =>
