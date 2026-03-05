@@ -258,12 +258,13 @@ function ExtratoAluno({ aluno }) {
   >
     {/* 🔹 Data */}
     <div>
-          {item.data_evento
-        ? (() => {
-            const [ano, mes, dia] = item.data_evento.split("-");
-            return `${dia}/${mes}/${ano}`;
-          })()
-        : "-"}
+        {item.data_evento
+      ? (() => {
+          const data = item.data_evento.split("T")[0];
+          const [ano, mes, dia] = data.split("-");
+          return `${dia}/${mes}/${ano}`;
+        })()
+      : "-"}
     </div>
 
     {/* 🔹 Tipo + Ícone */}
