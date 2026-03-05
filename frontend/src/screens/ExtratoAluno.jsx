@@ -156,7 +156,7 @@ function ExtratoAluno({ aluno }) {
               : "text-red-600"
           }`}
         >
-          Saldo atual: {formatarMoeda(saldoAtual)}
+          Saldo atual: {formatarNumero(saldoAtual)}
         </div>
 
 

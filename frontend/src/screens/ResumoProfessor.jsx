@@ -10,7 +10,11 @@ import {
 
 function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
 
-  const [mesSelecionado, setMesSelecionado] = useState("");
+  const hoje = new Date();
+  const mesAtual =
+    hoje.getFullYear() + "-" +
+    String(hoje.getMonth() + 1).padStart(2, "0");
+  const [mesSelecionado, setMesSelecionado] = useState(mesAtual);
 
   // ===============================
   // FILTRAR PAGAMENTOS POR MÊS
@@ -75,44 +79,42 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
   
     pagamentosFiltrados.forEach(p => {
   
-      const nome = p.aluno_nome || "Aluno";
+      const id = p.aluno_id;
   
-      if(!mapa[nome]){
-  
-        mapa[nome] = {
-          aluno: nome,
+      if(!mapa[id]){
+        mapa[id] = {
+          aluno_id: id,
+          aluno: p.aluno_nome,
           receita: 0,
           creditos: 0,
-          realizadas: 0,
-          aRealizar: 0
+          realizadas: 0
         };
-  
       }
   
-      mapa[nome].receita += Number(p.valor || 0);
-      mapa[nome].creditos += Number(p.creditos_gerados || 0);
+      mapa[id].receita += Number(p.valor || 0);
+      mapa[id].creditos += Number(p.creditos_gerados || 0);
   
     });
   
     aulasFiltradas.forEach(a => {
-
-      const nome = a.aluno_nome;
-      console.log("AULAS:", aulas);
-      console.log("PAGAMENTOS:", pagamentos);
-      if (!mapa[nome]) return;
-    
-      if (a.status?.toLowerCase() === "realizada") {
-        mapa[nome].realizadas += 1;
-      } else {
-        mapa[nome].aRealizar = (mapa[nome].aRealizar || 0) + 1;
+  
+      const id = a.aluno_id;
+  
+      if (!mapa[id]) return;
+  
+      if (
+        a.status === "realizada" ||
+        a.status === "cancelada_sem_justificativa"
+      ) {
+        mapa[id].realizadas += 1;
       }
-    
+  
     });
   
     return Object.values(mapa)
       .map(a => ({
         ...a,
-        saldo: a.creditos - a.realizadas
+        aRealizar: Math.max(a.creditos - a.realizadas, 0)
       }))
       .sort((a,b) => b.receita - a.receita);
   
@@ -126,7 +128,6 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
         onClick={voltar}
         className="text-secondary text-sm mb-4"
       >
-      ← Voltar
       </button>
 
       <h2 className="text-xl font-bold mb-6">
