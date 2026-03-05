@@ -30,7 +30,8 @@ function Login({ setUsuario }) {
       setToken(data.token);
       setUsuario(data.usuario);
 
-    }catch{
+    }catch(err){
+      console.error(err);
       setErro("Erro ao conectar com servidor");
     }
 

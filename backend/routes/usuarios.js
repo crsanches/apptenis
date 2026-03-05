@@ -4,8 +4,12 @@ const pool = require("../db");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 
-// criar usuario
+const { verificarToken, apenasAdmin } = require("../authMiddleware");
 
+
+// ===============================
+// LOGIN
+// ===============================
 router.post("/login", async (req,res)=>{
 
   const { email, senha } = req.body;
@@ -45,9 +49,11 @@ router.post("/login", async (req,res)=>{
 
 });
 
-// inserir usuario
 
-app.post("/usuarios", verificarToken, apenasAdmin, async (req,res)=>{
+// ===============================
+// CRIAR USUÁRIO
+// ===============================
+router.post("/usuarios", verificarToken, apenasAdmin, async (req,res)=>{
 
   const {nome,email,senha,perfil} = req.body;
 
@@ -63,8 +69,11 @@ app.post("/usuarios", verificarToken, apenasAdmin, async (req,res)=>{
 
 });
 
-//listar usuarios
-app.get("/usuarios", verificarToken, apenasAdmin, async (req,res)=>{
+
+// ===============================
+// LISTAR USUÁRIOS
+// ===============================
+router.get("/usuarios", verificarToken, apenasAdmin, async (req,res)=>{
 
   const result = await pool.query(
     "SELECT id,nome,email,perfil FROM usuarios ORDER BY nome"
@@ -75,9 +84,10 @@ app.get("/usuarios", verificarToken, apenasAdmin, async (req,res)=>{
 });
 
 
-//deletar usuario
-
-app.delete("/usuarios/:id", verificarToken, apenasAdmin, async (req,res)=>{
+// ===============================
+// DELETAR USUÁRIO
+// ===============================
+router.delete("/usuarios/:id", verificarToken, apenasAdmin, async (req,res)=>{
 
   await pool.query(
     "DELETE FROM usuarios WHERE id=$1",
@@ -87,7 +97,6 @@ app.delete("/usuarios/:id", verificarToken, apenasAdmin, async (req,res)=>{
   res.json({ok:true});
 
 });
-
 
 
 module.exports = router;
