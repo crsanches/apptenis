@@ -5,17 +5,42 @@ import ResumoProfessor from "./screens/ResumoProfessor";
 import { API_URL } from "./config";
 import Login from "./screens/Login.jsx";
 import { getToken, logout } from "./auth";
-
+import Usuarios from "./screens/Usuarios";
 function App() {
 
   // ===============================
   // ESTADOS
   // ===============================
   const [tela, setTela] = useState("menu");
+  const irParaUsuarios = () => {
+    setTela("usuarios");
+  };
   const [alunoSelecionado, setAlunoSelecionado] = useState(null);
   const [pagamentos, setPagamentos] = useState([]);
   const [aulas, setAulas] = useState([]);
   const [usuario,setUsuario] = useState(null);
+  useEffect(() => {
+
+    const token = getToken();
+  
+    if(token){
+  
+      try{
+  
+        const payload = JSON.parse(atob(token.split(".")[1]));
+  
+        setUsuario({
+          nome: payload.nome,
+          perfil: payload.perfil
+        });
+  
+      }catch{
+        logout();
+      }
+  
+    }
+  
+  }, []);
 
   // ===============================
   // BUSCAR PAGAMENTOS
@@ -124,6 +149,17 @@ function App() {
       {tela === "menu" && (
         <div className="space-y-6">
 
+          {usuario.perfil === "admin" && (
+
+          <button
+            onClick={irParaUsuarios}
+            className="w-full bg-purple-600 text-white py-4 rounded-xl text-lg font-semibold"
+          >
+            👥 Gerenciar Usuários
+          </button>
+
+          )}
+
           <button
             onClick={irParaResumo}
             className="w-full bg-blue-600 text-white py-4 rounded-xl text-lg font-semibold"
@@ -159,8 +195,13 @@ function App() {
         <ExtratoAluno aluno={alunoSelecionado} />
       )}
 
-    </div>
-  );
+      {/* USUARIOS */}
+      {tela === "usuarios" && (
+        <Usuarios voltar={irParaMenu}/>
+      )}
+
+          </div>
+        );
 }
 
 export default App;
