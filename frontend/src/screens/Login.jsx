@@ -8,7 +8,7 @@ function Login({ setUsuario }) {
   const [senha,setSenha] = useState("");
   const [erro,setErro] = useState("");
 
-  const entrar = async ()=>{
+  const entrar = async () => {
 
     try{
 
@@ -23,7 +23,7 @@ function Login({ setUsuario }) {
       const data = await res.json();
 
       if(!res.ok){
-        setErro(data.erro);
+        setErro(data.erro || "Erro no login");
         return;
       }
 
@@ -37,39 +37,56 @@ function Login({ setUsuario }) {
 
   };
 
-  return(
+  return (
 
-    <div style={{padding:20}}>
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
 
-      <h2>Login</h2>
+      <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
 
-      <input
-        placeholder="Email"
-        onChange={e=>setEmail(e.target.value)}
-      />
+        <h1 className="text-2xl font-bold text-center mb-2">
+          Controle de Aulas 🎾
+        </h1>
 
-      <br/><br/>
-
-      <input
-        type="password"
-        placeholder="Senha"
-        onChange={e=>setSenha(e.target.value)}
-      />
-
-      <br/><br/>
-
-      <button onClick={entrar}>
-        Entrar
-      </button>
-
-      {erro && (
-        <p style={{color:"red"}}>
-          {erro}
+        <p className="text-center text-gray-500 mb-6">
+          Acesse sua conta
         </p>
-      )}
+
+        <div className="space-y-4">
+
+          <input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={e=>setEmail(e.target.value)}
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <input
+            type="password"
+            placeholder="Senha"
+            value={senha}
+            onChange={e=>setSenha(e.target.value)}
+            className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <button
+            onClick={entrar}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+          >
+            Entrar
+          </button>
+
+          {erro && (
+            <p className="text-red-500 text-sm text-center">
+              {erro}
+            </p>
+          )}
+
+        </div>
+
+      </div>
 
     </div>
-
   );
 
 }
