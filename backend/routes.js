@@ -156,7 +156,7 @@ router.get("/aulas", async (req, res) => {
     const result = await pool.query(`
       SELECT
         au.id,
-        au.data_agendada AS data,
+        au.TO_CHAR(data_agendada, 'YYYY-MM-DD') as data_evento,
         au.status,
         au.aluno_id,
         a.nome AS aluno_nome
@@ -250,6 +250,11 @@ router.get("/saldo/:aluno_id", async (req, res) => {
 });
 
 
+// ==================================================
+// 🔹 EXTRATO
+// ==================================================
+
+
 router.get("/extrato/:aluno_id", async (req, res) => {
   const alunoId = req.params.aluno_id;
 
@@ -257,7 +262,7 @@ router.get("/extrato/:aluno_id", async (req, res) => {
     const pagamentos = await pool.query(`
     SELECT 
       id,
-      data as data_evento,
+      TO_CHAR(data, 'YYYY-MM-DD') as data_evento,
       creditos_gerados as quantidade,
       valor,
       valor_aula_na_epoca,
