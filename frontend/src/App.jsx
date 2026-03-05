@@ -3,7 +3,7 @@ import Dashboard from "./screens/Dashboard";
 import ExtratoAluno from "./screens/ExtratoAluno";
 import ResumoProfessor from "./screens/ResumoProfessor";
 import { API_URL } from "./config";
-import Login from "./screens/Login";
+import Login from "./screens/Login.jsx";
 import { getToken, logout } from "./auth";
 
 function App() {
