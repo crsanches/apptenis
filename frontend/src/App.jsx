@@ -19,6 +19,17 @@ function App() {
   const [pagamentos, setPagamentos] = useState([]);
   const [aulas, setAulas] = useState([]);
   const [usuario,setUsuario] = useState(null);
+  const voltar = () => {
+
+    if (tela === "extrato") {
+      setTela("controle");
+      setAlunoSelecionado(null);
+      return;
+    }
+  
+    setTela("menu");
+  
+  };
 
   const irParaUsuarios = () => {
     setTela("usuarios");
@@ -149,7 +160,7 @@ function App() {
       <div className="mb-6 flex justify-between items-center">
 
         <h1 className="text-2xl font-bold text-primary">
-          Controle de Aulas 🎾
+          Controle de Aulas 🎾🎾🎾🎾🎾🎾🎾🎾🎾🎾🎾🎾
         </h1>
 
         <div className="flex items-center gap-3">
@@ -174,7 +185,7 @@ function App() {
 
       {tela !== "menu" && (
         <button
-          onClick={irParaMenu}
+          onClick={voltar}
           className="text-secondary text-sm mb-4"
         >
           ← Voltar

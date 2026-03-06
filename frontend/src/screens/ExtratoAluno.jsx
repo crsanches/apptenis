@@ -259,7 +259,7 @@ function ExtratoAluno({ aluno }) {
 {!loading && extrato.map(item => (
   <div
     key={`${item.tipo}-${item.id}`}
-    className={`grid grid-cols-[0.8fr_1.3fr_0.9fr_0.9fr_0.9fr_0.4fr] px-2 py-0.5 text-[8px] border-t items-center ${corLinha(item)}`}
+    className={`grid grid-cols-[0.8fr_1.3fr_0.9fr_0.9fr_0.9fr_0.4fr] px-2 py-0.5 text-[10px] border-t items-center ${corLinha(item)}`}
   >
     {/* 🔹 Data */}
     <div>
@@ -296,7 +296,7 @@ function ExtratoAluno({ aluno }) {
             );
             carregarExtrato();
           }}
-          className="text-xs bg-white rounded pl-2 pr-1 py-1 shadow-sm"
+          className="text-[9px] bg-white rounded px-2 py-[2px] shadow-sm w-[110px]"
         >
           <option value="agendada">Agendada</option>
           <option value="realizada">Realizada</option>
