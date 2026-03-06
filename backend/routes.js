@@ -7,7 +7,7 @@ const pool = require("./db");
 // 🔹 ALUNOS
 // ==================================================
 
-router.get("/alunos", async (req, res) => {
+router.get("/alunos",verificarToken, async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT id, nome, valor_aula FROM alunos ORDER BY nome`
@@ -108,7 +108,7 @@ router.post("/pagamentos", async (req, res) => {
   }
 });
 
-router.get("/pagamentos", async (req, res) => {
+router.get("/pagamentos",verificarToken, async (req, res) => {
   try {
     const result = await pool.query(`
     SELECT 
@@ -150,7 +150,7 @@ router.delete("/pagamentos/:id", async (req, res) => {
 // 🔹 AULAS
 // ==================================================
 
-router.get("/aulas", async (req, res) => {
+router.get("/aulas",verificarToken, async (req, res) => {
   try {
     const result = await pool.query(`
       SELECT
@@ -225,7 +225,7 @@ router.delete("/aulas/:id", async (req, res) => {
 // 🔹 SALDO
 // ==================================================
 
-router.get("/saldo/:aluno_id", async (req, res) => {
+router.get("/saldo/:aluno_id",verificarToken, async (req, res) => {
   const alunoId = req.params.aluno_id;
 
   try {
@@ -255,7 +255,7 @@ router.get("/saldo/:aluno_id", async (req, res) => {
 // ==================================================
 
 
-router.get("/extrato/:aluno_id", async (req, res) => {
+router.get("/extrato/:aluno_id",verificarToken, async (req, res) => {
   const alunoId = req.params.aluno_id;
 
   try {
@@ -314,7 +314,7 @@ router.get("/extrato/:aluno_id", async (req, res) => {
   }
 });
 
-router.get("/dashboard/:mes", async (req, res) => {
+router.get("/dashboard/:mes", verificarToken, async (req, res) => {
   const mes = req.params.mes;
   const inicio = `${mes}-01`;
   const fim = `${mes}-31`;
