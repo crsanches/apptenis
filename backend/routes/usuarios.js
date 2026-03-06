@@ -9,7 +9,7 @@ const { verificarToken, apenasAdmin } = require("../authMiddleware");
 
 // ===============================
 // LOGIN
-// ===============================
+// ===============================  
 router.post("/login", async (req,res)=>{
 
   const { email, senha } = req.body;
