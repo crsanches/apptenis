@@ -7,10 +7,19 @@ function Login({ setUsuario }) {
   const [email,setEmail] = useState("");
   const [senha,setSenha] = useState("");
   const [erro,setErro] = useState("");
+  const [loading,setLoading] = useState(false);
 
   const entrar = async () => {
 
+    if(!email || !senha){
+      setErro("Informe email e senha");
+      return;
+    }
+
     try{
+
+      setErro("");
+      setLoading(true);
 
       const res = await fetch(`${API_URL}/login`,{
         method:"POST",
@@ -24,6 +33,13 @@ function Login({ setUsuario }) {
 
       if(!res.ok){
         setErro(data.erro || "Erro no login");
+        setLoading(false);
+        return;
+      }
+
+      if(!data.token){
+        setErro("Token não recebido");
+        setLoading(false);
         return;
       }
 
@@ -31,8 +47,14 @@ function Login({ setUsuario }) {
       setUsuario(data.usuario);
 
     }catch(err){
+
       console.error(err);
       setErro("Erro ao conectar com servidor");
+
+    }finally{
+
+      setLoading(false);
+
     }
 
   };
@@ -58,6 +80,7 @@ function Login({ setUsuario }) {
             placeholder="Email"
             value={email}
             onChange={e=>setEmail(e.target.value)}
+            onKeyDown={(e)=> e.key === "Enter" && entrar()}
             className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -66,14 +89,16 @@ function Login({ setUsuario }) {
             placeholder="Senha"
             value={senha}
             onChange={e=>setSenha(e.target.value)}
+            onKeyDown={(e)=> e.key === "Enter" && entrar()}
             className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
           <button
             onClick={entrar}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition disabled:opacity-50"
           >
-            Entrar
+            {loading ? "Entrando..." : "Entrar"}
           </button>
 
           {erro && (
@@ -87,6 +112,7 @@ function Login({ setUsuario }) {
       </div>
 
     </div>
+
   );
 
 }
