@@ -25,7 +25,7 @@ function ExtratoAluno({ aluno }) {
     setLoading(true);
   
     try {
-      const res = await fetchAuth(`${API_URL}/extrato/${aluno.id}`);
+      const res = await fetchAuth(`/extrato/${aluno.id}`);
       const data = await res.json();
   
       setExtrato(Array.isArray(data) ? data : []);
@@ -279,7 +279,7 @@ function ExtratoAluno({ aluno }) {
           value={item.status}
           onChange={async (e) => {
             await fetchAuth(
-              `${API_URL}/aulas/${item.id}/status`,
+              `/aulas/${item.id}/status`,
               {
                 method: "PUT",
                 headers: {
@@ -338,12 +338,12 @@ function ExtratoAluno({ aluno }) {
 
           if (item.tipo === "pagamento") {
             await fetchAuth(
-              `${API_URL}/pagamentos/${item.id}`,
+              `/pagamentos/${item.id}`,
               { method: "DELETE" }
             );
           } else {
             await fetchAuth(
-              `${API_URL}/aulas/${item.id}`,
+              `/aulas/${item.id}`,
               { method: "DELETE" }
             );
           }

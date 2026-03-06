@@ -6,7 +6,7 @@ function EditarAluno({ aluno, fechar, atualizar }) {
   const [valorAula, setValorAula] = useState(aluno.valor_aula);
 
   const salvar = async () => {
-    await fetch(`${API_URL}/alunos/${aluno.id}`, {
+    await fetch(`/alunos/${aluno.id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -28,14 +28,14 @@ function Dashboard({ abrirExtrato }) {
     try {
       setLoading(true);
 
-      const res = await fetchAuth(`${API_URL}/alunos`);
+      const res = await fetchAuth(`/alunos`);
       const data = await res.json();
       setAlunos(data);
 
       const saldosArray = await Promise.all(
         data.map(async (aluno) => {
           const r = await fetchAuth(
-            `${API_URL}/saldo/${aluno.id}`
+            `/saldo/${aluno.id}`
           );
           const saldoData = await r.json();
           return { id: aluno.id, saldo: saldoData.saldo };
@@ -57,7 +57,7 @@ function Dashboard({ abrirExtrato }) {
 
   // 🔹 Carregar dashboard mensal
   useEffect(() => {
-    fetchAuth(`${API_URL}/dashboard/${mesSelecionado}`)
+    fetchAuth(`/dashboard/${mesSelecionado}`)
       .then(res => res.json())
       .then(data => setDashboard(data))
       .catch(err => console.error("Erro dashboard:", err));
@@ -209,7 +209,7 @@ function Dashboard({ abrirExtrato }) {
                         return;
 
                       await fetchAuth(
-                        `${API_URL}/alunos/${aluno.id}`,
+                        `/alunos/${aluno.id}`,
                         { method: "DELETE" }
                       );
 

@@ -6,7 +6,7 @@ function NovoAluno({ fechar, atualizar}) {
   const [valorAula, setValorAula] = useState("");
 
   const salvar = async () => {
-    await fetch(`${API_URL}/alunos`, {
+    await fetch(`/alunos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

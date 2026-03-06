@@ -8,13 +8,13 @@ function NovaAula({ fechar }) {
   const [data, setData] = useState("");
 
   useEffect(() => {
-    fetchAuth(`${API_URL}/alunos`)
+    fetchAuth(`/alunos`)
       .then(res => res.json())
       .then(data => setAlunos(data));
   }, []);
 
   const salvar = async () => {
-    await fetchAuth(`${API_URL}/aulas`, {
+    await fetchAuth(`/aulas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

@@ -8,7 +8,7 @@ function AgendarAula({ aluno, fechar, atualizar }) {
   const salvar = async () => {
     if (!data) return alert("Informe a data");
 
-    await fetchAuth(`${API_URL}/aulas`, {
+    await fetchAuth(`/aulas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

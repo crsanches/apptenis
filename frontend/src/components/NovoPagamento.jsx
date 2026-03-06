@@ -9,7 +9,7 @@ function NovoPagamento({ aluno, fechar, atualizar }) {
   const [data, setData] = useState(hoje);
 
   const salvar = async () => {
-    await fetchAuth(`${API_URL}/pagamentos`, {
+    await fetchAuth(`/pagamentos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

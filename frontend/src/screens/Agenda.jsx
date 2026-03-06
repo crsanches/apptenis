@@ -22,11 +22,11 @@ function Agenda() {
   const [aulaSelecionada, setAulaSelecionada] = useState(null);
 
   const carregar = () => {
-    fetchAuth("${API_URL}/agenda")
+    fetchAuth("/agenda")
       .then(res => res.json())
       .then(data => setAulas(data));
 
-    fetchAuth("${API_URL}/alunos")
+    fetchAuth("/alunos")
       .then(res => res.json())
       .then(data => setAlunos(data));
   };
@@ -36,7 +36,7 @@ function Agenda() {
   }, []);
 
   const atualizarStatus = async (id, status) => {
-    await fetchAuth(`${API_URL}/aulas/${id}/status`, {
+    await fetchAuth(`/aulas/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status })

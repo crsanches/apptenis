@@ -10,7 +10,7 @@ function RemarcarAula({ aula, fechar, atualizar }) {
   const [novaData, setNovaData] = useState(dataInicial);
 
   const salvar = async () => {
-    await fetchAuth(`${API_URL}/aulas/${aula.id}/remarcar`, {
+    await fetchAuth(`/aulas/${aula.id}/remarcar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"
