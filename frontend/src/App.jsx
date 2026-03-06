@@ -160,7 +160,7 @@ function App() {
       <div className="mb-6 flex justify-between items-center">
 
         <h1 className="text-2xl font-bold text-primary">
-          Controle de Aulas 🎾🎾🎾🎾🎾🎾🎾🎾🎾🎾🎾🎾
+        🎾🎾🎾🎾🎾🎾 Controle de Aulas 🎾🎾🎾🎾🎾🎾🎾
         </h1>
 
         <div className="flex items-center gap-3">
