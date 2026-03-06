@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import NovoPagamento from "../components/NovoPagamento";
 import AgendarAula from "../components/AgendarAula";
-import { API_URL } from "../config";
 import { fetchAuth } from "../fetchAuth";
 
 
@@ -25,10 +24,15 @@ function ExtratoAluno({ aluno }) {
     setLoading(true);
   
     try {
-      const res = await fetchAuth(`/extrato/${aluno.id}`);
-     
   
-      setExtrato(Array.isArray(data) ? data : []);
+      const data = await fetchAuth(`/extrato/${aluno.id}`);
+  
+      if (Array.isArray(data)) {
+        setExtrato(data);
+      } else {
+        setExtrato([]);
+      }
+  
     } catch (err) {
       console.error("Erro ao carregar extrato:", err);
       setExtrato([]);
