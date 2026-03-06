@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import Modal from "../components/Modal";
 import RemarcarAula from "../components/RemarcarAula";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function Agenda() {
   const [aulas, setAulas] = useState([]);
@@ -21,11 +22,11 @@ function Agenda() {
   const [aulaSelecionada, setAulaSelecionada] = useState(null);
 
   const carregar = () => {
-    fetch("${API_URL}/agenda")
+    fetchAuth("${API_URL}/agenda")
       .then(res => res.json())
       .then(data => setAulas(data));
 
-    fetch("${API_URL}/alunos")
+    fetchAuth("${API_URL}/alunos")
       .then(res => res.json())
       .then(data => setAlunos(data));
   };
@@ -35,7 +36,7 @@ function Agenda() {
   }, []);
 
   const atualizarStatus = async (id, status) => {
-    await fetch(`${API_URL}/aulas/${id}/status`, {
+    await fetchAuth(`${API_URL}/aulas/${id}/status`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ status })

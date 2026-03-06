@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function NovaAula({ fechar }) {
   const [alunos, setAlunos] = useState([]);
@@ -7,13 +8,13 @@ function NovaAula({ fechar }) {
   const [data, setData] = useState("");
 
   useEffect(() => {
-    fetch(`${API_URL}/alunos`)
+    fetchAuth(`${API_URL}/alunos`)
       .then(res => res.json())
       .then(data => setAlunos(data));
   }, []);
 
   const salvar = async () => {
-    await fetch(`${API_URL}/aulas`, {
+    await fetchAuth(`${API_URL}/aulas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

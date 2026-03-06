@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function RemarcarAula({ aula, fechar, atualizar }) {
   const dataInicial = new Date(aula.data_agendada)
@@ -9,7 +10,7 @@ function RemarcarAula({ aula, fechar, atualizar }) {
   const [novaData, setNovaData] = useState(dataInicial);
 
   const salvar = async () => {
-    await fetch(`${API_URL}/aulas/${aula.id}/remarcar`, {
+    await fetchAuth(`${API_URL}/aulas/${aula.id}/remarcar`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json"

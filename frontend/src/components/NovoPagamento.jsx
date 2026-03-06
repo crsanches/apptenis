@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function NovoPagamento({ aluno, fechar, atualizar }) {
   const hoje = new Date().toISOString().split("T")[0];
@@ -8,7 +9,7 @@ function NovoPagamento({ aluno, fechar, atualizar }) {
   const [data, setData] = useState(hoje);
 
   const salvar = async () => {
-    await fetch(`${API_URL}/pagamentos`, {
+    await fetchAuth(`${API_URL}/pagamentos`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json"

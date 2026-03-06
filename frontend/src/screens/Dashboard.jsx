@@ -3,6 +3,7 @@ import Modal from "../components/Modal";
 import EditarAluno from "../components/EditarAluno";
 import NovoAluno from "../components/NovoAluno";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function Dashboard({ abrirExtrato }) {
   const [alunos, setAlunos] = useState([]);
@@ -27,13 +28,13 @@ function Dashboard({ abrirExtrato }) {
     try {
       setLoading(true);
 
-      const res = await fetch(`${API_URL}/alunos`);
+      const res = await fetchAuth(`${API_URL}/alunos`);
       const data = await res.json();
       setAlunos(data);
 
       const saldosArray = await Promise.all(
         data.map(async (aluno) => {
-          const r = await fetch(
+          const r = await fetchAuth(
             `${API_URL}/saldo/${aluno.id}`
           );
           const saldoData = await r.json();
@@ -56,7 +57,7 @@ function Dashboard({ abrirExtrato }) {
 
   // 🔹 Carregar dashboard mensal
   useEffect(() => {
-    fetch(`${API_URL}/dashboard/${mesSelecionado}`)
+    fetchAuth(`${API_URL}/dashboard/${mesSelecionado}`)
       .then(res => res.json())
       .then(data => setDashboard(data))
       .catch(err => console.error("Erro dashboard:", err));
@@ -207,7 +208,7 @@ function Dashboard({ abrirExtrato }) {
                       if (!window.confirm("Excluir aluno?"))
                         return;
 
-                      await fetch(
+                      await fetchAuth(
                         `${API_URL}/alunos/${aluno.id}`,
                         { method: "DELETE" }
                       );

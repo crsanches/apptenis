@@ -3,6 +3,7 @@ import Modal from "../components/Modal";
 import NovoPagamento from "../components/NovoPagamento";
 import AgendarAula from "../components/AgendarAula";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 
 function ExtratoAluno({ aluno }) {
@@ -24,7 +25,7 @@ function ExtratoAluno({ aluno }) {
     setLoading(true);
   
     try {
-      const res = await fetch(`${API_URL}/extrato/${aluno.id}`);
+      const res = await fetchAuth(`${API_URL}/extrato/${aluno.id}`);
       const data = await res.json();
   
       setExtrato(Array.isArray(data) ? data : []);
@@ -277,7 +278,7 @@ function ExtratoAluno({ aluno }) {
         <select
           value={item.status}
           onChange={async (e) => {
-            await fetch(
+            await fetchAuth(
               `${API_URL}/aulas/${item.id}/status`,
               {
                 method: "PUT",
@@ -336,12 +337,12 @@ function ExtratoAluno({ aluno }) {
           if (!window.confirm("Excluir lançamento?")) return;
 
           if (item.tipo === "pagamento") {
-            await fetch(
+            await fetchAuth(
               `${API_URL}/pagamentos/${item.id}`,
               { method: "DELETE" }
             );
           } else {
-            await fetch(
+            await fetchAuth(
               `${API_URL}/aulas/${item.id}`,
               { method: "DELETE" }
             );

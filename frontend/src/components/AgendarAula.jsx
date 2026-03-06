@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function AgendarAula({ aluno, fechar, atualizar }) {
   const [data, setData] = useState("");
@@ -7,7 +8,7 @@ function AgendarAula({ aluno, fechar, atualizar }) {
   const salvar = async () => {
     if (!data) return alert("Informe a data");
 
-    await fetch(`${API_URL}/aulas`, {
+    await fetchAuth(`${API_URL}/aulas`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
