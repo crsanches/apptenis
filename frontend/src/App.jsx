@@ -6,6 +6,7 @@ import { API_URL } from "./config";
 import Login from "./screens/Login.jsx";
 import { getToken, logout } from "./auth";
 import Usuarios from "./screens/Usuarios";
+import { fetchAuth } from "./fetchAuth";
 
 function App() {
 
@@ -54,35 +55,41 @@ function App() {
   // BUSCAR PAGAMENTOS
   // ===============================
 
-  const carregarPagamentos = () => {
+  const carregarPagamentos = async () => {
 
-    fetch(`${API_URL}/pagamentos`,{
-      headers:{
-        Authorization:`Bearer ${getToken()}`
+    try{
+  
+      const data = await fetchAuth("/pagamentos");
+  
+      if(Array.isArray(data)){
+        setPagamentos(data);
       }
-    })
-      .then(res => res.json())
-      .then(data => setPagamentos(data))
-      .catch(err => console.error("Erro ao buscar pagamentos:", err));
-
+  
+    }catch(err){
+      console.error("Erro ao buscar pagamentos:", err);
+    }
+  
   };
 
   // ===============================
   // BUSCAR AULAS
   // ===============================
 
-  const carregarAulas = () => {
+  const carregarAulas = async () => {
 
-    fetch(`${API_URL}/aulas`,{
-      headers:{
-        Authorization:`Bearer ${getToken()}`
-      }
-    })
-      .then(res => res.json())
-      .then(data => setAulas(data))
-      .catch(err => console.error("Erro ao buscar aulas:", err));
+  try{
 
-  };
+    const data = await fetchAuth("/aulas");
+
+    if(Array.isArray(data)){
+      setAulas(data);
+    }
+
+  }catch(err){
+    console.error("Erro ao buscar aulas:", err);
+  }
+
+};
 
   // ===============================
   // CARREGAR DADOS APÓS LOGIN

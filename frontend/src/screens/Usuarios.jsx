@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { API_URL } from "../config";
 import { getToken } from "../auth";
+import { fetchAuth } from "../fetchAuth";
 
 function Usuarios({ voltar }) {
 
@@ -16,16 +17,12 @@ function Usuarios({ voltar }) {
 
   const carregarUsuarios = async () => {
 
-    const res = await fetch(`${API_URL}/usuarios`,{
-      headers:{
-        Authorization:`Bearer ${getToken()}`
-      }
-    });
-
-    const data = await res.json();
-
-    setUsuarios(data);
-
+    const data = await fetchAuth("/usuarios");
+  
+    if(Array.isArray(data)){
+      setUsuarios(data);
+    }
+  
   };
 
   useEffect(()=>{
@@ -38,12 +35,8 @@ function Usuarios({ voltar }) {
 
   const criarUsuario = async () => {
 
-    await fetch(`${API_URL}/usuarios`,{
+    await fetchAuth("/usuarios",{
       method:"POST",
-      headers:{
-        "Content-Type":"application/json",
-        Authorization:`Bearer ${getToken()}`
-      },
       body:JSON.stringify({
         nome,
         email,
@@ -66,11 +59,8 @@ function Usuarios({ voltar }) {
 
   const deletarUsuario = async (id) => {
 
-    await fetch(`${API_URL}/usuarios/${id}`,{
-      method:"DELETE",
-      headers:{
-        Authorization:`Bearer ${getToken()}`
-      }
+    await fetchAuth(`/usuarios/${id}`,{
+      method:"DELETE"
     });
 
     carregarUsuarios();
