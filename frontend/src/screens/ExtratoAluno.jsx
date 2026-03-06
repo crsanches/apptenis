@@ -26,7 +26,7 @@ function ExtratoAluno({ aluno }) {
   
     try {
       const res = await fetchAuth(`/extrato/${aluno.id}`);
-      const data = await res.json();
+     
   
       setExtrato(Array.isArray(data) ? data : []);
     } catch (err) {
