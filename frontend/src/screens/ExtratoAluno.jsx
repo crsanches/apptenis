@@ -104,7 +104,8 @@ function ExtratoAluno({ aluno }) {
     extrato.length > 0
       ? extrato[extrato.length - 1].saldo
       : 0;
-
+  const saldoEmReais = saldoAtual * Number(aluno.valor_aula || 0);
+  const aulasRestantes = Math.floor(saldoAtual);
       const movimentosMes = extrato.filter((item) =>
         item.data_evento &&
         item.data_evento.startsWith(mesSelecionado)
@@ -121,7 +122,7 @@ function ExtratoAluno({ aluno }) {
           (i.status === "realizada" ||
             i.status === "cancelada_sem_justificativa")
       )
-      .reduce((acc) => acc + Number(aluno.valor_aula || 0), 0);
+      .reduce((acc) => acc + 1, 0) * Number(aluno.valor_aula || 0);
 
       const totalAulasMes = movimentosMes.filter(
         (i) =>
@@ -131,8 +132,8 @@ function ExtratoAluno({ aluno }) {
       ).length;
 
       const totalCreditosMes = movimentosMes
-        .filter((i) => i.tipo === "pagamento")
-        .reduce((acc, i) => acc + Number(i.quantidade || 0), 0);
+  .filter((i) => i.tipo === "pagamento")
+  .reduce((acc, i) => acc + Number(i.creditos_gerados || 0), 0);
 
       const totalDebitosMes = movimentosMes
         .filter(
@@ -174,6 +175,15 @@ function ExtratoAluno({ aluno }) {
         </div>
 
         {/* 🔹 Saldo Atual */}
+        <div className="bg-white rounded-xl shadow p-4 space-y-2">
+
+        <div className="text-sm text-gray-600">
+          Valor atual da aula:{" "}
+          <span className="font-semibold">
+            {formatarMoeda(Number(aluno.valor_aula || 0))}
+          </span>
+        </div>
+
         <div
           className={`text-lg font-bold ${
             saldoAtual >= 0
@@ -181,8 +191,24 @@ function ExtratoAluno({ aluno }) {
               : "text-red-600"
           }`}
         >
-          Saldo atual: {formatarNumero(saldoAtual)}
+          🎾 Saldo em aulas: {formatarNumero(saldoAtual)}
         </div>
+
+        <div className="text-sm">
+          💰 Saldo em dinheiro:{" "}
+          <span className="font-semibold">
+            {formatarMoeda(saldoEmReais)}
+          </span>
+        </div>
+
+        <div className="text-sm">
+          📊 Aulas disponíveis:{" "}
+          <span className="font-semibold">
+            {aulasRestantes}
+          </span>
+        </div>
+
+      </div>
 
 
         <div className="bg-white rounded-xl shadow p-4 space-y-2">
@@ -277,7 +303,9 @@ function ExtratoAluno({ aluno }) {
       <span>{iconeStatus(item)}</span>
 
       {item.tipo === "pagamento" ? (
-        <span>Pagamento</span>
+        <span>
+        Pagamento ({formatarNumero(item.credito)})
+      </span>
       ) : (
         <select
           value={item.status}
