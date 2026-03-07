@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function NovoAluno({ fechar, atualizar}) {
   const [nome, setNome] = useState("");
