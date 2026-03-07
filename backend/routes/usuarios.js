@@ -98,5 +98,48 @@ router.delete("/usuarios/:id", verificarToken, apenasAdmin, async (req,res)=>{
 
 });
 
+// ===============================
+// ATUALIZAR USUÁRIO
+// ===============================
+router.put("/usuarios/:id", verificarToken, apenasAdmin, async (req,res)=>{
+
+  const { id } = req.params;
+  const { nome, email, senha, perfil } = req.body;
+
+  try{
+
+    if(senha){
+
+      const hash = await bcrypt.hash(senha,10);
+
+      await pool.query(
+        `UPDATE usuarios
+         SET nome=$1,email=$2,senha=$3,perfil=$4
+         WHERE id=$5`,
+         [nome,email,hash,perfil,id]
+      );
+
+    }else{
+
+      await pool.query(
+        `UPDATE usuarios
+         SET nome=$1,email=$2,perfil=$3
+         WHERE id=$4`,
+         [nome,email,perfil,id]
+      );
+
+    }
+
+    res.json({ok:true});
+
+  }catch(err){
+
+    console.error(err);
+    res.status(500).json({erro:"Erro ao atualizar usuário"});
+
+  }
+
+});
+
 
 module.exports = router;
