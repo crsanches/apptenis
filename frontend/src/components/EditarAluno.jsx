@@ -1,22 +1,24 @@
 import { useState } from "react";
 import { API_URL } from "../config";
+import { fetchAuth } from "../fetchAuth";
 
 function EditarAluno({ aluno, fechar, atualizar }) {
   const [nome, setNome] = useState(aluno.nome);
   const [valorAula, setValorAula] = useState(aluno.valor_aula);
 
   const salvar = async () => {
-    await fetch(`/alunos/${aluno.id}`, {
+
+    await fetchAuth(`/alunos/${aluno.id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         nome,
         valor_aula: Number(valorAula)
       })
     });
-
+  
     fechar();
     atualizar();
+  
   };
 
   return (
