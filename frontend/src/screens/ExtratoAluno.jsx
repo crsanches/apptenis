@@ -143,14 +143,8 @@ function ExtratoAluno({ aluno }) {
       .filter((i) => i.tipo === "pagamento")
       .reduce((acc, i) => acc + Number(i.valor || 0), 0);
       
-      const totalConsumidoMes = movimentosMes
-      .filter(
-        (i) =>
-          i.tipo === "aula" &&
-          (i.status === "realizada" ||
-            i.status === "cancelada_sem_justificativa")
-      )
-      .reduce((acc) => acc + 1, 0) * Number(aluno.valor_aula || 0);
+      const totalConsumidoMes =
+      totalAulasMes * valorAulaAtual;
 
       const totalAulasMes = movimentosMes.filter(
         (i) =>
