@@ -1,15 +1,14 @@
 import { useState, useEffect } from "react";
-import { API_URL } from "../config";
-import { getToken } from "../auth";
 import { fetchAuth } from "../fetchAuth";
 
 function Usuarios({ voltar }) {
 
-  const [usuarios,setUsuarios] = useState([]);
-  const [nome,setNome] = useState("");
-  const [email,setEmail] = useState("");
-  const [senha,setSenha] = useState("");
-  const [perfil,setPerfil] = useState("usuario");
+  const [usuarios, setUsuarios] = useState([]);
+  const [nome, setNome] = useState("");
+  const [email, setEmail] = useState("");
+  const [senha, setSenha] = useState("");
+  const [perfil, setPerfil] = useState("usuario");
+  const [editandoId, setEditandoId] = useState(null);
 
   // ===============================
   // CARREGAR USUÁRIOS
@@ -18,38 +17,83 @@ function Usuarios({ voltar }) {
   const carregarUsuarios = async () => {
 
     const data = await fetchAuth("/usuarios");
-  
-    if(Array.isArray(data)){
+
+    if (Array.isArray(data)) {
       setUsuarios(data);
     }
-  
+
   };
 
-  useEffect(()=>{
+  useEffect(() => {
     carregarUsuarios();
-  },[]);
+  }, []);
 
   // ===============================
-  // CRIAR USUÁRIO
+  // LIMPAR FORMULÁRIO
   // ===============================
 
-  const criarUsuario = async () => {
-
-    await fetchAuth("/usuarios",{
-      method:"POST",
-      body:JSON.stringify({
-        nome,
-        email,
-        senha,
-        perfil
-      })
-    });
-
+  const limparFormulario = () => {
     setNome("");
     setEmail("");
     setSenha("");
+    setPerfil("usuario");
+    setEditandoId(null);
+  };
 
+  // ===============================
+  // SALVAR USUÁRIO (CRIAR OU EDITAR)
+  // ===============================
+
+  const salvarUsuario = async () => {
+
+    const body = {
+      nome,
+      email,
+      perfil
+    };
+
+    if (senha) {
+      body.senha = senha;
+    }
+
+    if (editandoId) {
+
+      await fetchAuth(`/usuarios/${editandoId}`, {
+        method: "PUT",
+        body: JSON.stringify(body)
+      });
+
+    } else {
+
+      await fetchAuth("/usuarios", {
+        method: "POST",
+        body: JSON.stringify({
+          nome,
+          email,
+          senha,
+          perfil
+        })
+      });
+
+    }
+
+    limparFormulario();
     carregarUsuarios();
+
+  };
+
+  // ===============================
+  // EDITAR USUÁRIO
+  // ===============================
+
+  const editarUsuario = (u) => {
+
+    setNome(u.nome);
+    setEmail(u.email);
+    setPerfil(u.perfil);
+    setSenha("");
+
+    setEditandoId(u.id);
 
   };
 
@@ -59,13 +103,19 @@ function Usuarios({ voltar }) {
 
   const deletarUsuario = async (id) => {
 
-    await fetchAuth(`/usuarios/${id}`,{
-      method:"DELETE"
+    if (!confirm("Excluir usuário?")) return;
+
+    await fetchAuth(`/usuarios/${id}`, {
+      method: "DELETE"
     });
 
     carregarUsuarios();
 
   };
+
+  // ===============================
+  // INTERFACE
+  // ===============================
 
   return (
 
@@ -82,21 +132,21 @@ function Usuarios({ voltar }) {
         👥 Gerenciar Usuários
       </h2>
 
-      {/* CRIAR USUÁRIO */}
+      {/* FORMULÁRIO */}
 
       <div className="space-y-2 mb-6">
 
         <input
           placeholder="Nome"
           value={nome}
-          onChange={e=>setNome(e.target.value)}
+          onChange={e => setNome(e.target.value)}
           className="border p-2 w-full"
         />
 
         <input
           placeholder="Email"
           value={email}
-          onChange={e=>setEmail(e.target.value)}
+          onChange={e => setEmail(e.target.value)}
           className="border p-2 w-full"
         />
 
@@ -104,29 +154,42 @@ function Usuarios({ voltar }) {
           type="password"
           placeholder="Senha"
           value={senha}
-          onChange={e=>setSenha(e.target.value)}
+          onChange={e => setSenha(e.target.value)}
           className="border p-2 w-full"
         />
 
         <select
           value={perfil}
-          onChange={e=>setPerfil(e.target.value)}
+          onChange={e => setPerfil(e.target.value)}
           className="border p-2 w-full"
         >
           <option value="usuario">Usuário</option>
           <option value="admin">Administrador</option>
         </select>
 
-        <button
-          onClick={criarUsuario}
-          className="bg-blue-600 text-white px-4 py-2 rounded"
-        >
-          Criar usuário
-        </button>
+        <div className="flex gap-2">
+
+          <button
+            onClick={salvarUsuario}
+            className="bg-blue-600 text-white px-4 py-2 rounded"
+          >
+            {editandoId ? "Salvar alterações" : "Criar usuário"}
+          </button>
+
+          {editandoId && (
+            <button
+              onClick={limparFormulario}
+              className="px-4 py-2 border rounded"
+            >
+              Cancelar
+            </button>
+          )}
+
+        </div>
 
       </div>
 
-      {/* LISTA */}
+      {/* LISTA DE USUÁRIOS */}
 
       <div className="space-y-2">
 
@@ -134,21 +197,32 @@ function Usuarios({ voltar }) {
 
           <div
             key={u.id}
-            className="flex justify-between border p-2 rounded"
+            className="flex justify-between items-center border p-2 rounded"
           >
 
             <div>
-              <b>{u.nome}</b><br/>
-              <span className="text-sm">{u.email}</span><br/>
+              <b>{u.nome}</b><br />
+              <span className="text-sm">{u.email}</span><br />
               <span className="text-xs">{u.perfil}</span>
             </div>
 
-            <button
-              onClick={()=>deletarUsuario(u.id)}
-              className="text-red-600"
-            >
-              🗑
-            </button>
+            <div className="flex gap-3">
+
+              <button
+                onClick={() => editarUsuario(u)}
+                className="text-blue-600"
+              >
+                ✏️
+              </button>
+
+              <button
+                onClick={() => deletarUsuario(u.id)}
+                className="text-red-600"
+              >
+                🗑
+              </button>
+
+            </div>
 
           </div>
 
