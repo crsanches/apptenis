@@ -205,7 +205,7 @@ function ExtratoAluno({ aluno }) {
               : "text-red-600"
           }`}
         >
-          🎾 Saldo em aulas: {formatarNumero(saldoAtual)}
+          🎾 Saldo em aulas acumuladas: {formatarNumero(saldoAtual)}
         </div>
 
         <div className="text-sm">
@@ -215,12 +215,7 @@ function ExtratoAluno({ aluno }) {
           </span>
         </div>
 
-        <div className="text-sm">
-          📊 Aulas disponíveis:{" "}
-          <span className="font-semibold">
-            {aulasRestantes}
-          </span>
-        </div>
+        
 
       </div>
 
@@ -241,7 +236,7 @@ function ExtratoAluno({ aluno }) {
 </div>
 
 <h3 className="font-semibold text-sm text-gray-600">
-  Resumo de {mesSelecionado}
+  Resumo do mês: 
 </h3>
 
   <div className="grid grid-cols-2 gap-2 text-sm">
@@ -261,14 +256,14 @@ function ExtratoAluno({ aluno }) {
     </div>
 
     <div>
-      📊 Aulas utilizadas:
+      📊 Aulas utilizadas neste mês:
       <span className="font-semibold ml-1">
         {totalAulasMes}
       </span>
     </div>
 
     <div>
-      🧮 Saldo:
+      🧮 Saldo de aulas deste mês:
       <span className="font-semibold ml-1">
       {formatarNumero(saldoAulasMes)}
       </span>
