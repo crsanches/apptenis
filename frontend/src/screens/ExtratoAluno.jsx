@@ -159,20 +159,12 @@ function ExtratoAluno({ aluno }) {
           i.status === "cancelada_sem_justificativa")
       ).length;
 
-      const totalCreditosMes = movimentosMes
-  .filter((i) => i.tipo === "pagamento")
-  .reduce((acc, i) => acc + Number(i.creditos_gerados || 0), 0);
+      const saldoReaisMes = totalPagoMes - totalConsumidoMes;
 
-      const totalDebitosMes = movimentosMes
-        .filter(
-          (i) =>
-            i.tipo === "aula" &&
-            (i.status === "realizada" ||
-              i.status === "cancelada_sem_justificativa")
-        )
-        .length;
-
-      const saldoAulasMes = totalCreditosMes - totalDebitosMes;
+      const saldoAulasMes =
+        valorAulaAtual > 0
+          ? saldoReaisMes / valorAulaAtual
+          : 0;
 
   return (
     <>
