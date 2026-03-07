@@ -227,52 +227,77 @@ router.delete("/aulas/:id", async (req, res) => {
 // 🔹 SALDO
 // ==================================================
 
-router.get("/saldo/:aluno_id",verificarToken, async (req, res) => {
+router.get("/saldo/:aluno_id", verificarToken, async (req, res) => {
   const alunoId = req.params.aluno_id;
 
   try {
-    const result = await pool.query(`
-      SELECT 
-        COALESCE(
-          (SELECT SUM(creditos_gerados) FROM pagamentos WHERE aluno_id = $1),0
-        )
-        -
-        COALESCE(
-          (SELECT COUNT(*) FROM aulas
-           WHERE aluno_id = $1
-           AND status IN ('realizada','cancelada_sem_justificativa')),0
-        ) as saldo
-    `, [alunoId]);
 
-    res.json({ saldo: Number(result.rows[0].saldo) });
+    const aluno = await pool.query(
+      `SELECT valor_aula FROM alunos WHERE id=$1`,
+      [alunoId]
+    );
+
+    const valorAula = Number(aluno.rows[0].valor_aula || 0);
+
+    const pagamentos = await pool.query(
+      `SELECT COALESCE(SUM(valor),0) as total
+       FROM pagamentos
+       WHERE aluno_id=$1`,
+      [alunoId]
+    );
+
+    const aulas = await pool.query(
+      `SELECT COUNT(*) as total
+       FROM aulas
+       WHERE aluno_id=$1
+       AND status IN ('realizada','cancelada_sem_justificativa')`,
+      [alunoId]
+    );
+
+    const totalPago = Number(pagamentos.rows[0].total);
+    const totalAulas = Number(aulas.rows[0].total);
+
+    const saldoReais = totalPago - totalAulas * valorAula;
+    const saldoAulas = valorAula > 0 ? saldoReais / valorAula : 0;
+
+    res.json({ saldo: saldoAulas });
 
   } catch (err) {
     res.status(500).json(err);
   }
 });
 
-
 // ==================================================
 // 🔹 EXTRATO
 // ==================================================
 
-
-router.get("/extrato/:aluno_id",verificarToken, async (req, res) => {
+router.get("/extrato/:aluno_id", verificarToken, async (req, res) => {
   const alunoId = req.params.aluno_id;
 
   try {
+
+    // 🔹 valor atual da aula
+    const aluno = await pool.query(
+      `SELECT valor_aula FROM alunos WHERE id = $1`,
+      [alunoId]
+    );
+
+    const valorAula = Number(aluno.rows[0]?.valor_aula || 0);
+
+    // 🔹 pagamentos
     const pagamentos = await pool.query(`
-    SELECT 
-      id,
-      data::date as data_evento,
-      creditos_gerados as quantidade,
-      valor,
-      valor_aula_na_epoca,
-      'pagamento' as tipo
-    FROM pagamentos
-    WHERE aluno_id = $1
+      SELECT 
+        id,
+        data::date as data_evento,
+        creditos_gerados as quantidade,
+        valor,
+        valor_aula_na_epoca,
+        'pagamento' as tipo
+      FROM pagamentos
+      WHERE aluno_id = $1
     `, [alunoId]);
 
+    // 🔹 aulas
     const aulas = await pool.query(`
       SELECT 
         id,
@@ -285,36 +310,70 @@ router.get("/extrato/:aluno_id",verificarToken, async (req, res) => {
 
     const eventos = [...pagamentos.rows, ...aulas.rows];
 
+    // 🔹 ordenar por data
     eventos.sort(
       (a, b) => new Date(a.data_evento) - new Date(b.data_evento)
     );
 
-    let saldo = 0;
+    let saldoReais = 0;
 
     const extrato = eventos.map(e => {
 
+      // PAGAMENTO
       if (e.tipo === "pagamento") {
-        saldo += Number(e.quantidade);
-        return { ...e, credito: Number(e.quantidade), debito: 0, saldo };
+
+        saldoReais += Number(e.valor);
+
+        const saldoAulas =
+          valorAula > 0 ? saldoReais / valorAula : 0;
+
+        return {
+          ...e,
+          credito: Number(e.quantidade),
+          debito: 0,
+          saldo: saldoAulas
+        };
       }
 
+      // AULA CONSUMIDA
       if (
         e.status === "realizada" ||
         e.status === "cancelada_sem_justificativa"
       ) {
-        saldo -= 1;
-        return { ...e, credito: 0, debito: 1, saldo };
+
+        saldoReais -= valorAula;
+
+        const saldoAulas =
+          valorAula > 0 ? saldoReais / valorAula : 0;
+
+        return {
+          ...e,
+          credito: 0,
+          debito: 1,
+          saldo: saldoAulas
+        };
       }
 
-      return { ...e, credito: 0, debito: 0, saldo };
+      // AULA AGENDADA OU CANCELADA
+      const saldoAulas =
+        valorAula > 0 ? saldoReais / valorAula : 0;
+
+      return {
+        ...e,
+        credito: 0,
+        debito: 0,
+        saldo: saldoAulas
+      };
     });
 
     res.json(extrato);
 
   } catch (err) {
+    console.error("Erro extrato:", err);
     res.status(500).json(err);
   }
 });
+
 
 router.get("/dashboard/:mes", verificarToken, async (req, res) => {
   const mes = req.params.mes;
