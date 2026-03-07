@@ -100,12 +100,40 @@ function ExtratoAluno({ aluno }) {
     }
   };
 
-  const saldoAtual =
-    extrato.length > 0
-      ? extrato[extrato.length - 1].saldo
-      : 0;
-  const saldoEmReais = saldoAtual * Number(aluno.valor_aula || 0);
-  const aulasRestantes = Math.floor(saldoAtual);
+// ***********************
+// LOGICA DOS CALCULOS
+//***********************
+
+
+      const valorAulaAtual = Number(aluno.valor_aula || 0);
+
+      // total pago
+      const totalPago = extrato
+        .filter((i) => i.tipo === "pagamento")
+        .reduce((acc, i) => acc + Number(i.valor || 0), 0);
+
+      // aulas consumidas
+      const totalAulasConsumidas = extrato
+        .filter(
+          (i) =>
+            i.tipo === "aula" &&
+            (i.status === "realizada" ||
+              i.status === "cancelada_sem_justificativa")
+        ).length;
+
+      // saldo em dinheiro
+      const saldoEmReais =
+        totalPago - totalAulasConsumidas * valorAulaAtual;
+
+      // saldo em aulas
+      const saldoAtual =
+        valorAulaAtual > 0
+          ? saldoEmReais / valorAulaAtual
+          : 0;
+
+      // aulas completas disponíveis
+      const aulasRestantes = Math.floor(saldoAtual);
+
       const movimentosMes = extrato.filter((item) =>
         item.data_evento &&
         item.data_evento.startsWith(mesSelecionado)
