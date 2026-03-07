@@ -6,11 +6,14 @@ function NovoAluno({ fechar, atualizar}) {
   const [valorAula, setValorAula] = useState("");
 
   const salvar = async () => {
-    await fetch(`/alunos`, {
+
+    if(!nome || !valorAula){
+      alert("Preencha nome e valor da aula");
+      return;
+    }
+
+    await fetchAuth("/alunos", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
       body: JSON.stringify({
         nome,
         valor_aula: Number(valorAula)
