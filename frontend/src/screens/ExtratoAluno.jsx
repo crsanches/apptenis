@@ -140,20 +140,21 @@ function ExtratoAluno({ aluno }) {
       );
 
       const totalPagoMes = movimentosMes
-      .filter((i) => i.tipo === "pagamento")
-      .reduce((acc, i) => acc + Number(i.valor || 0), 0);
-      
-      const totalConsumidoMes =
-      totalAulasMes * valorAulaAtual;
+        .filter((i) => i.tipo === "pagamento")
+        .reduce((acc, i) => acc + Number(i.valor || 0), 0);
 
       const totalAulasMes = movimentosMes.filter(
         (i) =>
           i.tipo === "aula" &&
           (i.status === "realizada" ||
-          i.status === "cancelada_sem_justificativa")
+            i.status === "cancelada_sem_justificativa")
       ).length;
 
-      const saldoReaisMes = totalPagoMes - totalConsumidoMes;
+      const totalConsumidoMes =
+        totalAulasMes * valorAulaAtual;
+
+      const saldoReaisMes =
+        totalPagoMes - totalConsumidoMes;
 
       const saldoAulasMes =
         valorAulaAtual > 0
