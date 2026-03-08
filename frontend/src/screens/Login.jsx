@@ -66,7 +66,7 @@ function Login({ setUsuario }) {
       <div className="bg-white p-8 rounded-2xl shadow-lg w-full max-w-sm">
 
         <h1 className="text-2xl font-bold text-center mb-2">
-          Controle de Aulas 🎾
+        🎾Controle de Aulas 🎾
         </h1>
 
         <p className="text-center text-gray-500 mb-6">
