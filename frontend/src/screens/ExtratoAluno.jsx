@@ -250,7 +250,7 @@ function ExtratoAluno({ aluno }) {
     </div>
 
     <div>
-      🎾 Valor consumido:
+      🎾 Consumido:
       <span className="font-semibold ml-1">
         {formatarMoeda(totalConsumidoMes)}
       </span>
@@ -334,7 +334,7 @@ function ExtratoAluno({ aluno }) {
             );
             carregarExtrato();
           }}
-          className="text-[9px] bg-white rounded px-1 py-[1px] shadow-sm w-[80px]"
+          className="text-[9px] bg-white rounded px-1 py-[1px] shadow-sm w-[70px]"
         >
           <option value="agendada">Agendada</option>
           <option value="realizada">Realizada</option>
