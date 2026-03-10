@@ -16,12 +16,15 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
     String(hoje.getMonth() + 1).padStart(2, "0");
   const [mesSelecionado, setMesSelecionado] = useState(mesAtual);
 
-  const formatarMesAno = (data) => {
-    const d = new Date(data);
-    return new Intl.DateTimeFormat("pt-BR", {
-      month: "long",
-      year: "numeric"
-    }).format(d);
+  const formatarMesAno = (mesAno) => {
+    const [ano, mes] = mesAno.split("-");
+    
+    const meses = [
+      "janeiro","fevereiro","março","abril","maio","junho",
+      "julho","agosto","setembro","outubro","novembro","dezembro"
+    ];
+  
+    return `${meses[Number(mes) - 1]}/${ano}`;
   };
 
   // ===============================
@@ -190,10 +193,10 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
       =============================== */}
       <div>
   <h3 className="font-semibold mb-4">
-    Resumo por Aluno
+    Resumo das aulas por Aluno
   </h3>
 
-  <table className="w-full text-[9px]">
+  <table className="w-full text-[10px]">
 
     <thead>
       <tr className="border-b text-gray-600">
