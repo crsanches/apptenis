@@ -237,34 +237,34 @@ function ExtratoAluno({ aluno }) {
 </div>
 
 <h3 className="font-semibold text-sm text-gray-600">
-  Resumo do mês: 
+  Resumo de aulas do mês: 
 </h3>
 
   <div className="grid grid-cols-2 gap-2 text-[11px]">
 
     <div>
-      💰 Pago:
+      💰 Valor pago:
       <span className="font-semibold ml-1">
         {formatarMoeda(totalPagoMes)}
       </span>
     </div>
 
     <div>
-      🎾 Consumido:
+      🎾 Valor consumido:
       <span className="font-semibold ml-1">
         {formatarMoeda(totalConsumidoMes)}
       </span>
     </div>
 
     <div>
-      📊 Aulas utilizadas neste mês:
+      📊 Utilizadas no mês:
       <span className="font-semibold ml-1">
         {totalAulasMes}
       </span>
     </div>
 
     <div>
-      🧮 Saldo de aulas deste mês:
+      🧮 Saldo do mês:
       <span className="font-semibold ml-1">
       {formatarNumero(saldoAulasMes)}
       </span>
