@@ -16,6 +16,14 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
     String(hoje.getMonth() + 1).padStart(2, "0");
   const [mesSelecionado, setMesSelecionado] = useState(mesAtual);
 
+  const formatarMesAno = (data) => {
+    const d = new Date(data);
+    return new Intl.DateTimeFormat("pt-BR", {
+      month: "long",
+      year: "numeric"
+    }).format(d);
+  };
+
   // ===============================
   // FILTRAR PAGAMENTOS POR MÊS
   // ===============================
@@ -138,7 +146,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
           FILTRO POR MÊS
       =============================== */}
       <div className="mb-6">
-        <label className="text-sm mr-2">Filtrar por mês:</label>
+        <label className="text-sm mr-2">Escolha o mês do resumo:</label>
         <input
           type="month"
           value={mesSelecionado}
@@ -152,7 +160,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
       =============================== */}
       <div className="bg-green-50 p-4 rounded-xl shadow mb-8">
         <p className="text-sm text-gray-500">
-          Total Recebido {mesSelecionado && `( ${mesSelecionado} )`}
+        Total Recebido {mesSelecionado && `( ${formatarMesAno(mesSelecionado)} )`}
         </p>
         <p className="text-2xl font-bold text-green-600">
         R$ {Number(totalRecebido || 0).toFixed(2)}
@@ -185,7 +193,7 @@ function ResumoProfessor({ voltar, pagamentos = [], aulas = [] }) {
     Resumo por Aluno
   </h3>
 
-  <table className="w-full text-sm">
+  <table className="w-full text-[9px]">
 
     <thead>
       <tr className="border-b text-gray-600">
