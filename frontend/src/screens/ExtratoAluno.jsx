@@ -240,7 +240,7 @@ function ExtratoAluno({ aluno }) {
   Resumo do mês: 
 </h3>
 
-  <div className="grid grid-cols-2 gap-2 text-sm">
+  <div className="grid grid-cols-2 gap-2 text-[11px]">
 
     <div>
       💰 Pago:
@@ -314,7 +314,7 @@ function ExtratoAluno({ aluno }) {
 
       {item.tipo === "pagamento" ? (
         <span>
-        Pagamento ({formatarNumero(item.credito)})
+        Pagamento
       </span>
       ) : (
         <select
@@ -334,7 +334,7 @@ function ExtratoAluno({ aluno }) {
             );
             carregarExtrato();
           }}
-          className="text-[9px] bg-white rounded px-2 py-[2px] shadow-sm w-[110px]"
+          className="text-[9px] bg-white rounded px-1 py-[1px] shadow-sm w-[80px]"
         >
           <option value="agendada">Agendada</option>
           <option value="realizada">Realizada</option>
